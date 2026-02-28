@@ -150,7 +150,7 @@ function startTrading() {
     // Trading must ONLY start after admin confirmation (i.e., active investment exists)
     if (!userTradingIsActive()) return;
     if (tradingInterval) return;
-    tradingInterval = setInterval(updateChart, 0);
+    tradingInterval = setInterval(updateChart, 2000);
 }
 
 function stopTrading() {
