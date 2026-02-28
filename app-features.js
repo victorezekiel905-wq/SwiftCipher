@@ -1,3 +1,132 @@
+// ==================== 35% LIVE GROWTH ENGINE (app-features.js) ====================
+// Requirement: Profit counts up every 60 seconds once Admin approves a plan.
+// Calculation: MinuteProfit = (InvestedAmount * 0.35) / 10080
+// Syncs to Supabase every 5 minutes.
+
+var _growthEngineInterval = null;
+var _growthLastSyncTime = 0;
+var _GROWTH_SYNC_MS = 5 * 60 * 1000; // 5 minutes
+
+function tickGrowthEngine() {
+    if (!window.APP || !APP.currentUser) return;
+
+    // Support both .investment (new) and ._dbInvestment (legacy)
+    var inv = APP.currentUser.investment || APP.currentUser._dbInvestment;
+    if (!inv) return;
+
+    var status    = inv.status;
+    var amount    = Number(inv.amount    || 0);
+    var startTime = Number(inv.startTime || 0);
+
+    // Only run when admin has approved (status === 'active' and startTime is set)
+    if (status !== 'active' || amount <= 0 || startTime <= 0) return;
+    if (inv.completed) return;
+
+    var TOTAL_MINUTES = 10080; // 7 days × 24 h × 60 min
+    var TOTAL_ROI     = 0.35;  // 35%
+    var now           = Date.now();
+    var elapsedMs     = now - startTime;
+    var elapsedMinutes = Math.floor(elapsedMs / 60000);
+
+    var maxProfit  = amount * TOTAL_ROI;
+    var newProfit  = Math.min((amount * TOTAL_ROI / TOTAL_MINUTES) * elapsedMinutes, maxProfit);
+    newProfit = Math.round(newProfit * 100) / 100;
+
+    var isCompleted = (elapsedMinutes >= TOTAL_MINUTES);
+    if (isCompleted) newProfit = maxProfit;
+
+    // ---- Update in-memory immediately (UI sees latest values) ----
+    if (APP.currentUser.investment) {
+        APP.currentUser.investment.profit    = newProfit;
+        APP.currentUser.investment.status    = isCompleted ? 'completed' : 'active';
+        APP.currentUser.investment.completed = isCompleted;
+    }
+    if (APP.currentUser._dbInvestment) {
+        APP.currentUser._dbInvestment.profit    = newProfit;
+        APP.currentUser._dbInvestment.completed = isCompleted;
+    }
+    APP.currentUser.investmentWallet = amount + newProfit;
+
+    // ---- Update Dashboard UI text live ----
+    var dashEl = document.getElementById('dashInterestAccrued');
+    if (dashEl && typeof formatCurrency === 'function') {
+        dashEl.textContent = formatCurrency(newProfit);
+    }
+    // Update wallet page interest earned element
+    var walletEl = document.getElementById('walletInterestEarned');
+    if (walletEl && typeof formatCurrency === 'function') {
+        walletEl.textContent = formatCurrency(newProfit);
+    }
+    // Update available balance element
+    var availEl = document.getElementById('walletAvailableBalance');
+    if (availEl && typeof formatCurrency === 'function') {
+        availEl.textContent = formatCurrency(amount + newProfit);
+    }
+    // Update status labels
+    document.querySelectorAll('.inv-engine-status').forEach(function(el) {
+        el.textContent = isCompleted ? '\u2705 Completed' : '\u23f3 In Progress';
+        el.style.color = isCompleted ? 'var(--success)' : 'var(--warning)';
+    });
+
+    // ---- Sync to Supabase every 5 minutes ----
+    var shouldSync = (now - _growthLastSyncTime) >= _GROWTH_SYNC_MS;
+    if (shouldSync && window.sbUpdateUserById && APP.currentUser) {
+        _growthLastSyncTime = now;
+        var updatedInv = Object.assign({}, inv, {
+            profit:    newProfit,
+            status:    isCompleted ? 'completed' : 'active',
+            completed: isCompleted
+        });
+        window.sbUpdateUserById(APP.currentUser.id, { investment: updatedInv })
+            .then(function(row) {
+                if (row && APP.currentUser) {
+                    var freshInv = (row.investment) || updatedInv;
+                    APP.currentUser._dbInvestment = freshInv;
+                    APP.currentUser.investment    = freshInv;
+                }
+            })
+            .catch(function() { /* silent fail - UI already has latest in-memory value */ });
+    }
+
+    // Stop engine when plan completes
+    if (isCompleted) {
+        clearInterval(_growthEngineInterval);
+        _growthEngineInterval = null;
+    }
+}
+
+function startGrowthEngine() {
+    if (_growthEngineInterval) return; // already running
+    tickGrowthEngine();                // immediate first tick
+    _growthEngineInterval = setInterval(tickGrowthEngine, 60000); // every 60 seconds
+}
+
+function stopGrowthEngine() {
+    clearInterval(_growthEngineInterval);
+    _growthEngineInterval = null;
+}
+
+// Called after login / page refresh to decide whether to start or stop the engine
+window.maybeStartGrowthEngine = function() {
+    if (!window.APP || !APP.currentUser) { stopGrowthEngine(); return; }
+    var inv       = APP.currentUser.investment || APP.currentUser._dbInvestment;
+    var amount    = Number((inv && inv.amount)    || 0);
+    var startTime = Number((inv && inv.startTime) || 0);
+    var status    = (inv && inv.status) || 'inactive';
+    var completed = !!(inv && inv.completed);
+
+    if (amount > 0 && startTime > 0 && status === 'active' && !completed) {
+        startGrowthEngine();
+    } else {
+        stopGrowthEngine();
+    }
+};
+window.startGrowthEngine = startGrowthEngine;
+window.stopGrowthEngine  = stopGrowthEngine;
+window.tickGrowthEngine  = tickGrowthEngine;
+
+// ==================== END 35% LIVE GROWTH ENGINE ====================
+
 // ==================== TRADING CANDLESTICK FIX (LOGIC ONLY) ====================
 // Use ONE interval only. Prevent duplicate intervals. Clear when inactive.
 let tradingInterval = null;
