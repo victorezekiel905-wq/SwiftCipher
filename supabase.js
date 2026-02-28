@@ -90,4 +90,8 @@
       return null;
     }
   };
+  // Auto-ensure the Super Admin record exists on every page load (silent, no UI impact)
+  // This runs once per session so the admin can log in from any device.
+  window.sbEnsureSuperAdminRecord();
+
 })();
