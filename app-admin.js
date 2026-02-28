@@ -670,8 +670,19 @@ function renderAdmin() {
                                                 return `<span style="font-size:11px;color:var(--text-secondary);">View only</span>`;
                                             }
 
+                                            // ---- Approve Investment button ----
+                                            const invAmt    = Number((user.investment && user.investment.amount) || 0);
+                                            const invStatus = (user.investment && user.investment.status) || 'inactive';
+                                            const isAlreadyActive = (invStatus === 'active' || invStatus === 'completed');
+                                            const approveBtn = canEdit
+                                                ? (invAmt > 0
+                                                    ? `<button class="btn ${isAlreadyActive ? 'btn-secondary' : 'btn-success'}" style="padding:4px 10px; font-size:11px;" ${isAlreadyActive ? 'disabled title="Already active"' : ''} onclick="adminApproveInvestment('${user.id}')">${isAlreadyActive ? '✓ Active' : '✅ Approve Inv.'}</button>`
+                                                    : `<button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" disabled title="No investment amount set">No Inv.</button>`)
+                                                : '';
+
                                             return `
                                                 <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                                    ${approveBtn}
                                                     <select class="input" style="padding:6px 10px; font-size:11px; max-width:140px;" ${canEdit ? '' : 'disabled'} onchange="adminChangeUserRole('${user.id}', this.value)">
                                                         <option value="user" ${role==='user'?'selected':''}>user</option>
                                                         <option value="sub_admin" ${role==='sub_admin'?'selected':''}>sub_admin</option>
@@ -1323,3 +1334,85 @@ function viewReceiptInModal(paymentId) {
     `;
 }
 window.viewReceiptInModal = viewReceiptInModal;
+
+// ===================== ADMIN: APPROVE INVESTMENT (Direct from Users table) =====================
+// Activates a user's investment directly from the Admin Dashboard.
+// Sets investment.status = 'active', records startTime, then awards 20% referral bonus.
+window.adminApproveInvestment = async function(userId) {
+    if (!(typeof isSuperAdmin === 'function' && isSuperAdmin())) {
+        showToast('Super Admin permission required', 'error');
+        return;
+    }
+
+    const row = (window.__ADMIN_USERS_CACHE || []).find(function(u) {
+        return u && String(u.id) === String(userId);
+    });
+    if (!row) {
+        showToast('User not found in cache — try refreshing', 'error');
+        return;
+    }
+
+    const inv    = row.investment || {};
+    const amount = Number(inv.amount || 0);
+
+    if (amount <= 0) {
+        showToast('This user has no investment amount set. Ask them to submit a plan first.', 'error');
+        return;
+    }
+
+    const invStatus = (inv.status || 'inactive');
+    if (invStatus === 'active') {
+        showToast('Investment is already active for this user.', 'info');
+        return;
+    }
+    if (invStatus === 'completed') {
+        showToast('Investment has already completed for this user.', 'info');
+        return;
+    }
+
+    const now = Date.now();
+    const updatedInvestment = Object.assign({}, inv, {
+        amount:    amount,
+        profit:    0,
+        status:    'active',
+        startTime: now,
+        completed: false
+    });
+
+    try {
+        // ---- 1. Activate investment in Supabase ----
+        await window.sbUpdateUserById(userId, { investment: updatedInvestment });
+        showToast('\u2705 Investment approved & activated for ' + (row.name || row.email), 'success');
+
+        // ---- 2. Referral bonus: 20% of amount to referrer\'s wallet.balance ----
+        const refBy = inv.referredBy
+                   || (row.wallet && row.wallet.referredBy)
+                   || null;
+
+        if (refBy && window.sbFetchAllUsers && window.normalizeEmail) {
+            const allUsers = await window.sbFetchAllUsers();
+            const referrer = (allUsers || []).find(function(u) {
+                return u && window.normalizeEmail(u.email) === window.normalizeEmail(refBy);
+            });
+
+            if (referrer) {
+                const refBonus     = amount * 0.20;
+                const currentBal   = Number((referrer.wallet && referrer.wallet.balance) || 0);
+                const updatedWallet = Object.assign({}, (referrer.wallet || {}), {
+                    balance: currentBal + refBonus
+                });
+                await window.sbUpdateUserById(referrer.id, { wallet: updatedWallet });
+                showToast('Referral bonus of ' + formatCurrency(refBonus) + ' added to referrer (' + (referrer.email || '') + ')', 'info');
+            }
+        }
+
+        // ---- 3. Reload admin users table ----
+        if (typeof adminEnsureUsersLoaded === 'function') {
+            await adminEnsureUsersLoaded();
+        }
+
+    } catch (err) {
+        showToast('Failed to approve investment: ' + ((err && err.message) || 'Unknown error'), 'error');
+    }
+};
+window.adminApproveInvestment = window.adminApproveInvestment;
