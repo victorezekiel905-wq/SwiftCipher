@@ -1,0 +1,3139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftCipher - Advanced Crypto Investment & Trading Platform</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #0F0F1A;
+            --bg-secondary: #1A1A2E;
+            --bg-card: #1E1E30;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B4B4C8;
+            --accent: #6C63FF;
+            --accent-hover: #5549E6;
+            --success: #00D4AA;
+            --danger: #FF4757;
+            --warning: #FFA502;
+            --border: #2A2A3E;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #F8F9FF;
+            --bg-secondary: #FFFFFF;
+            --bg-card: #FFFFFF;
+            --text-primary: #1A1A2E;
+            --text-secondary: #6B6B80;
+            --border: #E5E5EF;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+        
+        /* Card Styles */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(108, 99, 255, 0.15);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        
+        /* Button Styles */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #5549E6 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(108, 99, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Input Styles */
+        .input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            transform: translateX(-260px);
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--accent);
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--accent) 0%, #5549E6 100%);
+            color: white;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 24px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: 0;
+        }
+        
+        /* Top Bar */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 16px 24px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        /* Stats Card */
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: scaleIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Ticker */
+        .ticker {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        
+        .ticker-content {
+            display: flex;
+            gap: 32px;
+            animation: scroll 30s linear infinite;
+        }
+        
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        table tr:hover {
+            background: rgba(108, 99, 255, 0.05);
+        }
+        
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-danger {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--danger);
+        }
+        
+        .badge-warning {
+            background: rgba(255, 165, 2, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-primary {
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--accent);
+        }
+        
+        /* Progress Bar */
+        .progress {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, #5549E6 100%);
+            transition: width 0.3s ease;
+        }
+        
+        /* Mobile Bottom Nav */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            padding: 12px;
+            z-index: 100;
+        }
+        
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .bottom-nav-item.active {
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--accent);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--bg-secondary);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Auth Pages */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+        }
+        
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Password Strength */
+        .password-strength {
+            height: 4px;
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .password-strength-bar.weak {
+            width: 33%;
+            background: var(--danger);
+        }
+        
+        .password-strength-bar.medium {
+            width: 66%;
+            background: var(--warning);
+        }
+        
+        .password-strength-bar.strong {
+            width: 100%;
+            background: var(--success);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-260px);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+                padding-bottom: 80px;
+            }
+            
+            .bottom-nav {
+                display: flex;
+            }
+            
+            .topbar {
+                flex-wrap: wrap;
+            }
+            
+            .auth-card {
+                padding: 32px 24px;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            table th, table td {
+                padding: 8px;
+            }
+        }
+        
+        /* Hide scrollbar but keep functionality */
+        .hide-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Grid responsive */
+        .grid-responsive {
+            display: grid;
+            gap: 24px;
+        }
+        
+        @media (min-width: 640px) {
+            .grid-responsive { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (min-width: 1024px) {
+            .grid-responsive { grid-template-columns: repeat(4, 1fr); }
+        }
+        
+        .grid-responsive-2 {
+            display: grid;
+            gap: 24px;
+        }
+        
+        @media (min-width: 1024px) {
+            .grid-responsive-2 { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        .grid-responsive-3 {
+            display: grid;
+            gap: 24px;
+        }
+        
+        @media (min-width: 640px) {
+            .grid-responsive-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (min-width: 1024px) {
+            .grid-responsive-3 { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- App Container -->
+    <div id="app"></div>
+    
+    <!-- Supabase (CDN) + Init -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ✅ Provide your anon key here (required)
+        // You said: "Use provided anon key" — it was not inside this zip, so paste it below.
+        window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'PASTE_SUPABASE_ANON_KEY_HERE';
+    </script>
+    <script src="supabase.js"></script>
+
+    <!-- App Scripts -->
+    <script src="app-features.js"></script>
+    <script src="app-admin.js"></script>
+    <script src="admin-supabase.js"></script>
+    
+    <script>
+        // ==================== GLOBAL STATE ====================
+        // ==================== STORAGE OVERRIDE (Requirement: localStorage stores ONLY loggedInEmail) ====================
+        // Any other keys are stored in-memory (cross-refresh not persisted).
+        (function() {
+            try {
+                const __set = localStorage.setItem.bind(localStorage);
+                const __get = localStorage.getItem.bind(localStorage);
+                const __rem = localStorage.removeItem.bind(localStorage);
+                window.__MEM_STORE = window.__MEM_STORE || {};
+
+                localStorage.setItem = function(k, v) {
+                    if (k === 'loggedInEmail') return __set(k, v);
+                    window.__MEM_STORE[k] = String(v);
+                };
+                localStorage.getItem = function(k) {
+                    if (k === 'loggedInEmail') return __get(k);
+                    return Object.prototype.hasOwnProperty.call(window.__MEM_STORE, k) ? window.__MEM_STORE[k] : null;
+                };
+                localStorage.removeItem = function(k) {
+                    if (k === 'loggedInEmail') return __rem(k);
+                    delete window.__MEM_STORE[k];
+                };
+            } catch (e) {}
+        })();
+
+        const APP = {
+            currentUser: null,
+            currentRoute: '#/login',
+            theme: 'dark',
+            prices: {
+                BTC: 67432,
+                ETH: 3847,
+                BNB: 582,
+                SOL: 178,
+                ADA: 0.63,
+                USDT: 1.00
+            },
+            charts: {}
+        };
+
+        // ==================== AUTH / ROLE (SUPABASE) ====================
+        // IMPORTANT:
+        // - Do NOT hardcode admin checks in frontend.
+        // - Always fetch role from Supabase Users table.
+        // - localStorage stores ONLY: loggedInEmail (auth marker)
+
+        function getCurrentRole() {
+            return (APP.currentUser && APP.currentUser.role) ? APP.currentUser.role : 'user';
+        }
+
+        function isSuperAdmin() {
+            return getCurrentRole() === 'super_admin';
+        }
+
+        function isSubAdmin() {
+            return getCurrentRole() === 'sub_admin';
+        }
+
+        function isAnyAdmin() {
+            const r = getCurrentRole();
+            return r === 'super_admin' || r === 'sub_admin';
+        }
+        
+        // ==================== UTILITY FUNCTIONS ====================
+        function $(selector) {
+            return document.querySelector(selector);
+        }
+        
+        function $$(selector) {
+            return document.querySelectorAll(selector);
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            
+            const icon = type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ';
+            const color = type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--accent)';
+            
+            toast.innerHTML = `
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: ${color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                    ${icon}
+                </div>
+                <div style="flex: 1;">${message}</div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        function formatCurrency(amount, decimals = 2) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            }).format(amount);
+        }
+        
+        function formatCrypto(amount, decimals = 8) {
+            return parseFloat(amount).toFixed(decimals).replace(/\.?0+$/, '');
+        }
+        
+        function formatDate(timestamp) {
+            return new Date(timestamp).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        function formatDateTime(timestamp) {
+            return new Date(timestamp).toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function generateId() {
+            return 'id_' + Math.random().toString(36).substr(2, 9) + Date.now();
+        }
+        
+        // ==================== LOCAL STORAGE ====================
+        function initStorage() {
+            if (!localStorage.getItem('cryptonexus_users')) {
+                const users = [
+                    {
+                        id: 'u1',
+                        name: 'Alex Johnson',
+                        email: 'demo@swiftcipher.com',
+                        password: 'Demo123!',
+                        role: 'user',
+                        referralCode: 'ALEX2024',
+                        referredBy: null,
+                        cashoutDetails: { cryptoAddress: '', bankName: '', accountName: '', accountNumber: '' },
+                        wallets: { BTC: 0.25, ETH: 3.5, BNB: 12, SOL: 0.5, ADA: 1000, USDT: 5420 },
+                        investmentWallet: 0,
+                        referralWallet: 180.50,
+                        tradingBalance: 0,
+                        tradingStarting: 0,
+                        registrationBonus: 0,
+                        createdAt: Date.now() - 90 * 24 * 60 * 60 * 1000
+                    }
+                ];
+                localStorage.setItem('cryptonexus_users', JSON.stringify(users));
+            }
+
+            // (Supabase mode) No local super-admin sanitization.
+            
+            if (!localStorage.getItem('cryptonexus_investments')) {
+                const investments = [];
+                localStorage.setItem('cryptonexus_investments', JSON.stringify(investments));
+            }
+            
+            if (!localStorage.getItem('cryptonexus_trades')) {
+                const trades = [
+                    {
+                        id: 't1',
+                        userId: 'u1',
+                        pair: 'BTC/USDT',
+                        type: 'buy',
+                        amount: 0.05,
+                        entryPrice: 66500,
+                        currentPrice: 67432,
+                        leverage: 1,
+                        status: 'open',
+                        openedAt: Date.now() - 2 * 60 * 60 * 1000
+                    },
+                    {
+                        id: 't2',
+                        userId: 'u1',
+                        pair: 'ETH/USDT',
+                        type: 'sell',
+                        amount: 0.5,
+                        entryPrice: 3900,
+                        currentPrice: 3847,
+                        leverage: 2,
+                        status: 'open',
+                        openedAt: Date.now() - 5 * 60 * 60 * 1000
+                    },
+                    {
+                        id: 't3',
+                        userId: 'u1',
+                        pair: 'BTC/USDT',
+                        type: 'buy',
+                        amount: 0.1,
+                        entryPrice: 65000,
+                        exitPrice: 66000,
+                        leverage: 1,
+                        status: 'closed',
+                        profit: 100,
+                        openedAt: Date.now() - 48 * 60 * 60 * 1000,
+                        closedAt: Date.now() - 24 * 60 * 60 * 1000
+                    }
+                ];
+                localStorage.setItem('cryptonexus_trades', JSON.stringify(trades));
+            }
+            
+            if (!localStorage.getItem('cryptonexus_referrals')) {
+                const referrals = [
+                    {
+                        id: 'r1',
+                        referrerId: 'u1',
+                        referredUserId: 'u2',
+                        referredEmail: 'j***@gmail.com',
+                        invested: 2000,
+                        commission: 200,
+                        level: 1,
+                        status: 'active',
+                        createdAt: Date.now() - 30 * 24 * 60 * 60 * 1000
+                    },
+                    {
+                        id: 'r2',
+                        referrerId: 'u1',
+                        referredUserId: 'u3',
+                        referredEmail: 'm***@yahoo.com',
+                        invested: 800,
+                        commission: 80,
+                        level: 1,
+                        status: 'active',
+                        createdAt: Date.now() - 20 * 24 * 60 * 60 * 1000
+                    },
+                    {
+                        id: 'r3',
+                        referrerId: 'u1',
+                        referredUserId: 'u4',
+                        referredEmail: 's***@hotmail.com',
+                        invested: 500,
+                        commission: 25,
+                        level: 2,
+                        status: 'active',
+                        createdAt: Date.now() - 15 * 24 * 60 * 60 * 1000
+                    }
+                ];
+                localStorage.setItem('cryptonexus_referrals', JSON.stringify(referrals));
+            }
+            
+            
+            if (!localStorage.getItem('cryptonexus_investment_payments')) {
+                const payments = [];
+                localStorage.setItem('cryptonexus_investment_payments', JSON.stringify(payments));
+            }
+
+if (!localStorage.getItem('cryptonexus_transactions')) {
+                const transactions = [];
+                localStorage.setItem('cryptonexus_transactions', JSON.stringify(transactions));
+            }
+            
+            // Load theme
+            APP.theme = localStorage.getItem('cryptonexus_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', APP.theme);
+        }
+        
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('cryptonexus_users') || '[]');
+        }
+        
+        function saveUsers(users) {
+            localStorage.setItem('cryptonexus_users', JSON.stringify(users));
+        }
+        
+        function getInvestments() {
+            return JSON.parse(localStorage.getItem('cryptonexus_investments') || '[]');
+        }
+        
+        function saveInvestments(investments) {
+            localStorage.setItem('cryptonexus_investments', JSON.stringify(investments));
+        }
+        
+        function getTrades() {
+            return JSON.parse(localStorage.getItem('cryptonexus_trades') || '[]');
+        }
+        
+        function saveTrades(trades) {
+            localStorage.setItem('cryptonexus_trades', JSON.stringify(trades));
+        }
+        
+        function getReferrals() {
+            return JSON.parse(localStorage.getItem('cryptonexus_referrals') || '[]');
+        }
+        
+        function saveReferrals(referrals) {
+            localStorage.setItem('cryptonexus_referrals', JSON.stringify(referrals));
+        }
+        
+        function getInvestmentPayments() {
+            return JSON.parse(localStorage.getItem('cryptonexus_investment_payments') || '[]');
+        }
+        
+        function saveInvestmentPayments(payments) {
+            localStorage.setItem('cryptonexus_investment_payments', JSON.stringify(payments));
+        }
+        
+function getTransactions() {
+            return JSON.parse(localStorage.getItem('cryptonexus_transactions') || '[]');
+        }
+        
+        function saveTransactions(transactions) {
+            localStorage.setItem('cryptonexus_transactions', JSON.stringify(transactions));
+        }
+        
+        function addTransaction(transaction) {
+            const transactions = getTransactions();
+            transactions.unshift({
+                id: generateId(),
+                userId: APP.currentUser.id,
+                createdAt: Date.now(),
+                status: 'completed',
+                ...transaction
+            });
+            saveTransactions(transactions);
+        }
+
+        function addTransactionForUser(userId, transaction) {
+            const transactions = getTransactions();
+            transactions.unshift({
+                id: generateId(),
+                userId,
+                createdAt: Date.now(),
+                status: 'completed',
+                ...transaction
+            });
+            saveTransactions(transactions);
+        }
+
+        // ===================== INVESTMENT TIMEBASE (REAL, PER-MINUTE) =====================
+        // Growth is spread smoothly per minute across the plan duration.
+        // Works on static hosting: all state is persisted in localStorage.
+        const MINUTE_MS = 60 * 1000;
+        const DAY_MS = 24 * 60 * 60 * 1000;
+        const PAYMENT_ADDRESS = '0x91160439d1b3efe9bc7ef3562047e731a3969af5'; // default USDT/ETH/BEP20
+
+        // REAL COIN ADDRESSES
+        const COIN_ADDRESSES = {
+            Bitcoin:    '12vo4k8J823LE5Yfuk8ktsadkWxPggTtVs',
+            USDT:       '0x91160439d1b3efe9bc7ef3562047e731a3969af5',
+            Ethereum:   '0x91160439d1b3efe9bc7ef3562047e731a3969af5',
+            'Smart Chain (BEP20)': '0x91160439d1b3efe9bc7ef3562047e731a3969af5',
+            Solana:     'ABwomrD9jgvZEe31nVCVg4Qfrv2DNg3QbCSh6DLhn92N',
+            'ADA (Cardano)': 'Ae2tdPwUPEZAExarFRPGSNR5CoXABYmg5tBFjKRBVfBzQ77g6nbQ1fZeXcV'
+        };
+
+        function normalizeInvestmentStatus(status) {
+            if (status === 'matured') return 'completed';
+            return status;
+        }
+
+        function getInvestmentTotalReturnRate(inv) {
+            // Total return rate is the plan's MAX PROFIT percentage (as a fraction).
+            // Starter example: 35% over 7 days => 0.35.
+            if (!inv) return 0;
+            if (typeof inv.totalReturnRate === 'number') return inv.totalReturnRate;
+            if (typeof inv.maxReturnRate === 'number') return inv.maxReturnRate;
+            // Fallback: dailyROI (e.g., 0.05) * durationDays (e.g., 7) => 0.35
+            if (typeof inv.dailyROI === 'number' && typeof inv.duration === 'number') return inv.dailyROI * inv.duration;
+            return 0;
+        }
+
+        function getInvestmentStartTime(inv) {
+            return inv.startTime || inv.startDate || inv.createdAt || 0;
+        }
+
+        function getInvestmentEndTime(inv) {
+            if (inv.endTime) return inv.endTime;
+            const start = getInvestmentStartTime(inv);
+            const durationDays = inv.duration || 0;
+            return start ? (start + durationDays * DAY_MS) : 0;
+        }
+
+        function getInvestmentElapsedDays(inv) {
+            const start = getInvestmentStartTime(inv);
+            if (!start) return 0;
+            const durationDays = inv.duration || 0;
+            const elapsedDays = (Date.now() - start) / DAY_MS;
+            return Math.max(0, Math.min(elapsedDays, durationDays));
+        }
+
+        function getInvestmentComputedStatus(inv) {
+            const end = getInvestmentEndTime(inv);
+            if (!end) return inv.status || 'active';
+            return Date.now() >= end ? 'completed' : 'active';
+        }
+
+        // ===================== PER-MINUTE INVESTMENT GROWTH =====================
+        // Profit is spread across total minutes (durationDays * 1440) and stops exactly at endTime.
+        function getInvestmentAccruedInterest(inv) {
+            if (!inv || !inv.amount || !inv.duration) return 0;
+
+            const start = getInvestmentStartTime(inv);
+            const end = getInvestmentEndTime(inv);
+            if (!start || !end) return 0;
+
+            const durationMinutes = inv.duration * 1440;
+            const totalProfit = inv.amount * getInvestmentTotalReturnRate(inv);
+
+            const now = Date.now();
+            const clampedNow = Math.min(Math.max(now, start), end);
+            const elapsedMinutesPrecise = (clampedNow - start) / MINUTE_MS;
+
+            // Smooth growth (updates can happen every second, but profit is still based on minutes)
+            const profitEarned = totalProfit * (elapsedMinutesPrecise / durationMinutes);
+            return Math.max(0, Math.min(totalProfit, profitEarned));
+        }
+
+        function getUserInvestmentsComputed(userId) {
+            const all = getInvestments();
+            let changed = false;
+            const now = Date.now();
+
+            const computed = all
+                .filter(i => i.userId === userId)
+                .map(i => ({ ...i }))
+                .map(inv => {
+                    const startTime = getInvestmentStartTime(inv) || now;
+                    const endTime = getInvestmentEndTime(inv) || (startTime + (inv.duration || 0) * DAY_MS);
+                    const status = (now >= endTime) ? 'completed' : 'active';
+
+                    const totalProfit = (inv.amount || 0) * getInvestmentTotalReturnRate(inv);
+                    const durationMinutes = (inv.duration || 0) * 1440;
+                    const perMinuteIncrement = durationMinutes > 0 ? (totalProfit / durationMinutes) : 0;
+
+                    const profitEarned = getInvestmentAccruedInterest({ ...inv, startTime, endTime });
+                    const currentValue = (inv.amount || 0) + profitEarned;
+
+                    // Persist required fields (throttled to once per minute OR on completion)
+                    const lastPersistAt = inv.lastPersistAt || 0;
+                    const shouldPersist = status === 'completed' || (now - lastPersistAt) >= MINUTE_MS;
+
+                    if (
+                        inv.startTime !== startTime ||
+                        inv.endTime !== endTime ||
+                        inv.status !== status ||
+                        (shouldPersist && (inv.currentValue !== currentValue || inv.profitEarned !== profitEarned))
+                    ) {
+                        changed = true;
+                        inv.startTime = startTime;
+                        inv.endTime = endTime;
+                        inv.status = status;
+                        inv.planType = inv.planType || inv.plan || '';
+                        inv.totalProfit = totalProfit;
+                        inv.perMinuteIncrement = perMinuteIncrement;
+                        inv.profitEarned = profitEarned;
+                        inv.currentValue = currentValue;
+                        inv.lastPersistAt = now;
+                        if (status === 'completed' && !inv.completedAt) inv.completedAt = now;
+                    }
+
+                    return {
+                        ...inv,
+                        startTime,
+                        endTime,
+                        status,
+                        interestAccrued: profitEarned,
+                        profitEarned,
+                        currentValue,
+                        perMinuteIncrement,
+                        daysElapsed: getInvestmentElapsedDays({ ...inv, startTime }),
+                        totalProfit
+                    };
+                });
+
+            if (changed) {
+                // Merge computed changes back into storage (no duplicates, reload-safe)
+                const updated = all.map(inv => {
+                    if (inv.userId !== userId) return inv;
+                    const c = computed.find(x => x.id === inv.id);
+                    return c ? { ...inv, ...c } : inv;
+                });
+                saveInvestments(updated);
+            }
+
+            return computed;
+        }
+
+        function getUserPendingPayments(userId) {
+            // Supabase mode: payments are not modeled in DB in this static demo.
+            return [];
+        }
+
+        function getUserRegistrationBonus(userId) {
+            // Supabase mode: bonus is not stored in DB schema.
+            return 0;
+        }
+
+        function getWalletInvestmentSummary(userId) {
+            // Requirement: wallet + investment must come from database.
+            if (APP.currentUser && APP.currentUser.id === userId && APP.currentUser._dbInvestment) {
+                const inv = APP.currentUser._dbInvestment || {};
+                const totalInvested = Number(inv.amount || 0);
+                const profitEarned  = Number(inv.profit || 0);
+                const pendingPayments = 0;
+                const bonus = 0;
+                const walletBalance = totalInvested + profitEarned;
+
+                // Determine investment status based on completion + startTime
+                const isCompleted = !!(inv.completed);
+                const isActive    = (totalInvested > 0 && Number(inv.startTime || 0) > 0 && !isCompleted);
+
+                const pseudoInvs = totalInvested > 0 ? [
+                    {
+                        id: 'db_inv_' + userId,
+                        userId,
+                        plan: 'Starter Plan',
+                        amount: totalInvested,
+                        interestAccrued: profitEarned,
+                        dailyROI: 5,
+                        duration: 7,
+                        daysElapsed: isActive ? Math.floor((Date.now() - Number(inv.startTime || 0)) / 86400000) : (isCompleted ? 7 : 0),
+                        startDate: Number(inv.startTime || Date.now()),
+                        startTime: Number(inv.startTime || 0),
+                        status: isCompleted ? 'completed' : isActive ? 'active' : 'pending'
+                    }
+                ] : [];
+
+                return {
+                    totalInvested,
+                    interestEarned: profitEarned,
+                    availableBalance: walletBalance,
+                    pendingPayments,
+                    bonus,
+                    investments: pseudoInvs
+                };
+            }
+
+            // Fallback (localStorage / no DB data)
+            const invs = getUserInvestmentsComputed(userId);
+            const totalInvested = invs.reduce((s,i)=>s+(i.amount||0),0);
+            const profitEarned  = invs.reduce((s,i)=>s+(i.interestAccrued||0),0);
+            const pendingPayments = getUserPendingPayments(userId).reduce((s,p)=>s+(p.amount||0),0);
+            const bonus = getUserRegistrationBonus(userId);
+            const walletBalance = totalInvested + profitEarned;
+
+            return {
+                totalInvested,
+                interestEarned: profitEarned,
+                availableBalance: walletBalance,
+                pendingPayments,
+                bonus,
+                investments: invs
+            };
+        }
+
+        // isSuperAdmin() already defined above (Supabase role-based)
+
+        
+        // ==================== PRICE SIMULATION ====================
+        function updatePrices() {
+            Object.keys(APP.prices).forEach(crypto => {
+                if (crypto === 'USDT') return; // USDT is stablecoin
+
+                const change = (Math.random() - 0.5) * 0.01; // ±0.5%
+                APP.prices[crypto] = APP.prices[crypto] * (1 + change);
+            });
+
+            // Update price displays
+            $$('[data-price]').forEach(el => {
+                const crypto = el.getAttribute('data-price');
+                if (APP.prices[crypto]) {
+                    el.textContent = formatCurrency(APP.prices[crypto]);
+                }
+            });
+
+            // NOTE: Trading chart movement is controlled by ONE trading interval only.
+            // (See app-features.js: startTrading/stopTrading)
+        }
+        
+        setInterval(updatePrices, 3000); // Update every 3 seconds
+
+        function syncUserInvestmentWalletToStorage(userId) {
+            // (Supabase mode) Intentionally no-op.
+            // Wallet/investment values are loaded from Supabase on each auth refresh.
+            return;
+        }
+
+        function refreshRealtimeInvestmentUI() {
+            if (!APP.currentUser) return;
+            const route = APP.currentRoute;
+
+            // Keep trading state synced as well (start/stop immediately on approval)
+            if (route === '#/trading' && typeof syncTradingState === 'function') {
+                syncTradingState();
+            }
+
+            if (!['#/dashboard', '#/wallet'].includes(route)) return;
+            const s = getWalletInvestmentSummary(APP.currentUser.id);
+            const dash = document.getElementById('dashInterestAccrued');
+            if (dash) dash.textContent = formatCurrency(s.interestEarned);
+            const w1 = document.getElementById('walletTotalInvested');
+            const w2 = document.getElementById('walletInterestEarned');
+            const w3 = document.getElementById('walletAvailableBalance');
+            const w4 = document.getElementById('walletPendingPayments');
+            if (w1) w1.textContent = formatCurrency(s.totalInvested);
+            if (w2) w2.textContent = formatCurrency(s.interestEarned);
+            if (w3) w3.textContent = formatCurrency(s.availableBalance);
+            if (w4) w4.textContent = formatCurrency(s.pendingPayments);
+            // Withdrawable amount
+            if (typeof getWithdrawableAmount === 'function') {
+                const wA  = document.getElementById('walletWithdrawableAmt');
+                if (wA)  wA.textContent  = formatCurrency(getWithdrawableAmount(APP.currentUser.id));
+                const wAB = document.getElementById('withdrawAvailBal');
+                if (wAB) wAB.textContent = formatCurrency(getWithdrawableAmount(APP.currentUser.id));
+            }
+            // Live investment status badges
+            const dbInv = (APP.currentUser._dbInvestment) || {};
+            const isComp = !!(dbInv.completed);
+            const isAct  = (Number(dbInv.amount||0) > 0 && Number(dbInv.startTime||0) > 0 && !isComp);
+            document.querySelectorAll('.inv-engine-status').forEach(function(el) {
+                if (isComp)      { el.textContent = '✅ Completed';  el.style.color = 'var(--success)'; }
+                else if (isAct)  { el.textContent = '⏳ In Progress'; el.style.color = 'var(--warning)'; }
+                else             { el.textContent = '⏸ Pending Approval'; el.style.color = 'var(--text-secondary)'; }
+            });
+        }
+
+        setInterval(refreshRealtimeInvestmentUI, 1000);
+
+        // ==================== PER-MINUTE INVESTMENT ENGINE ====================
+        // Starter Plan: 35% total profit over 7 days (10080 minutes)
+        // Per-minute rate: (amount * 0.35) / 10080
+        // Only runs after Super Admin confirms the investment.
+        // Profit is calculated time-based (works across all devices/sessions).
+
+        var _investEngineTimer = null;
+
+        function startInvestmentEngine() {
+            if (_investEngineTimer) return;
+            tickInvestmentEngine(); // immediate tick
+            _investEngineTimer = setInterval(tickInvestmentEngine, 60000);
+        }
+
+        function stopInvestmentEngine() {
+            clearInterval(_investEngineTimer);
+            _investEngineTimer = null;
+        }
+
+        async function tickInvestmentEngine() {
+            if (!APP.currentUser) return;
+            var inv = APP.currentUser._dbInvestment;
+            if (!inv) return;
+
+            var amount    = Number(inv.amount    || 0);
+            var startTime = Number(inv.startTime || 0);
+
+            // Nothing to compute if no approved investment exists
+            if (amount <= 0 || startTime <= 0) return;
+            // Already completed — no further accrual
+            if (inv.completed) return;
+
+            var TOTAL_MINUTES = 10080; // 7 days × 24h × 60min
+            var TOTAL_ROI     = 0.35;  // 35%
+            var now           = Date.now();
+            var elapsedMs     = now - startTime;
+            var elapsedMinutes = Math.floor(elapsedMs / 60000);
+
+            var maxProfit  = amount * TOTAL_ROI;
+            var newProfit  = Math.min(
+                (amount * TOTAL_ROI / TOTAL_MINUTES) * elapsedMinutes,
+                maxProfit
+            );
+            newProfit = Math.round(newProfit * 100) / 100;
+
+            var isCompleted = (elapsedMinutes >= TOTAL_MINUTES);
+
+            // ---- Update in-memory immediately (UI sees latest values) ----
+            APP.currentUser._dbInvestment.profit    = newProfit;
+            APP.currentUser._dbInvestment.completed = isCompleted;
+            APP.currentUser.investmentWallet        = amount + newProfit;
+
+            // ---- Persist to Supabase ----
+            if (window.sbUpdateUserById) {
+                try {
+                    var updatedInv = Object.assign({}, inv, {
+                        profit:    newProfit,
+                        completed: isCompleted
+                    });
+                    var saved = await window.sbUpdateUserById(APP.currentUser.id, { investment: updatedInv });
+                    if (saved) {
+                        APP.currentUser._dbInvestment = Object.assign({}, updatedInv);
+                    }
+                } catch (e) {
+                    // Silent fail — UI still shows latest in-memory value.
+                }
+            }
+
+            // ---- Update status labels on the page ----
+            var statusEls = document.querySelectorAll('.inv-engine-status');
+            statusEls.forEach(function(el) {
+                el.textContent = isCompleted ? '✅ Completed' : '⏳ In Progress';
+                el.style.color = isCompleted ? 'var(--success)' : 'var(--warning)';
+            });
+
+            // ---- Force UI refresh on dashboard/wallet pages ----
+            refreshRealtimeInvestmentUI();
+        }
+
+        // Start engine when user is logged in and has an active investment
+        function maybeStartInvestmentEngine() {
+            if (!APP.currentUser) { stopInvestmentEngine(); return; }
+            var inv = APP.currentUser._dbInvestment;
+            var amount    = Number((inv && inv.amount)    || 0);
+            var startTime = Number((inv && inv.startTime) || 0);
+            var completed = !!(inv && inv.completed);
+            if (amount > 0 && startTime > 0 && !completed) {
+                startInvestmentEngine();
+            } else {
+                stopInvestmentEngine();
+            }
+        }
+        // ==================== END INVESTMENT ENGINE ====================
+
+
+        function mapDbUserToAppUser(row) {
+            if (!row) return null;
+
+            const w = row.wallet || {};
+            const inv = row.investment || {};
+
+            return {
+                id: row.id,
+                name: row.name || (String(row.email || '').split('@')[0] || 'User'),
+                email: row.email,
+                password: row.password,
+                role: row.role || 'user',
+                status: row.status || 'active',
+
+                // UI-compatible fields
+                wallets: {
+                    BTC: 0,
+                    ETH: 0,
+                    BNB: 0,
+                    SOL: 0,
+                    ADA: 0,
+                    USDT: Number(w.balance || 0)
+                },
+                // Zero-balance policy: investmentWallet = 0 until admin approves
+                investmentWallet: Number(inv.amount || 0) + Number(inv.profit || 0),
+                referralWallet: Number(w.referralBalance || 0),
+                // Zero-balance policy: trading account starts at $0 until investment is approved
+                tradingBalance: 0,
+                tradingStarting: 0,
+                registrationBonus: 50,
+                createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
+
+                // DB snapshots (for future writes)
+                _dbWallet: w,
+                _dbInvestment: inv
+            };
+        }
+
+        async function refreshCurrentUserFromDb() {
+            const email = localStorage.getItem('loggedInEmail');
+            if (!email) return null;
+
+            const row = await window.sbGetUserByEmail(email);
+            if (!row) return null;
+
+            APP.currentUser = mapDbUserToAppUser(row);
+            return APP.currentUser;
+        }
+
+        async function login(email, password) {
+            if (!window.sbGetUserByEmail) {
+                showToast('Supabase not initialized. Add anon key in index.html', 'error');
+                return false;
+            }
+
+            const e = window.normalizeEmail(email);
+            const row = await window.sbGetUserByEmail(e);
+
+            if (!row || String(row.password || '') !== String(password || '')) {
+                showToast('Invalid email or password', 'error');
+                return false;
+            }
+
+            if (row.status && String(row.status).toLowerCase() !== 'active') {
+                showToast('Account is not active. Contact support.', 'error');
+                return false;
+            }
+
+            // localStorage stores ONLY the auth marker
+            localStorage.setItem('loggedInEmail', e);
+
+            // Always use fresh data from Supabase
+            APP.currentUser = mapDbUserToAppUser(row);
+
+            showToast('Login successful! Welcome back, ' + (APP.currentUser.name || 'User'), 'success');
+
+            // Load admin users if this account has admin privileges
+            if (typeof adminEnsureUsersLoaded === 'function' && isAnyAdmin()) {
+                adminEnsureUsersLoaded();
+            }
+
+            // Start the per-minute investment engine if applicable
+            maybeStartInvestmentEngine();
+
+            navigate('#/dashboard');
+            return true;
+        }
+
+        async function register(data) {
+            if (!window.sb) {
+                showToast('Supabase not initialized.', 'error');
+                return false;
+            }
+
+            const email = window.normalizeEmail(data.email);
+
+            const existing = await window.sbGetUserByEmail(email);
+            if (existing) {
+                showToast('Email already registered', 'error');
+                return false;
+            }
+
+            // ---- Referral: store the referrer's email inside investment jsonb ----
+            let referredBy = null;
+            if (data.referralCode && data.referralCode.trim()) {
+                try {
+                    // Referral code = referrer's email address
+                    const referrer = await window.sbGetUserByEmail(data.referralCode.trim());
+                    if (referrer) {
+                        referredBy = window.normalizeEmail(referrer.email);
+                    }
+                } catch (e) { /* ignore bad referral codes */ }
+            }
+
+            const newRow = {
+                name: data.name,
+                email,
+                password: data.password,
+                role: 'user',
+                status: 'active',
+                wallet:     { balance: 0, pending: 0 },
+                investment: { amount: 0, profit: 0, completed: false, referredBy: referredBy }
+            };
+
+            const { error } = await window.sb.from('Users').insert(newRow);
+            if (error) {
+                showToast('Registration failed: ' + (error.message || 'Unknown error'), 'error');
+                return false;
+            }
+
+            showToast('Registration successful! Please login.', 'success');
+            navigate('#/login');
+            return true;
+        }
+
+        function logout() {
+            APP.currentUser = null;
+            stopInvestmentEngine();
+            localStorage.removeItem('loggedInEmail');
+            showToast('Logged out successfully', 'success');
+            navigate('#/login');
+        }
+
+        async function checkAuth() {
+            const email = localStorage.getItem('loggedInEmail');
+            if (!email) return false;
+
+            try {
+                await refreshCurrentUserFromDb();
+                if (APP.currentUser) {
+                    maybeStartInvestmentEngine();
+                }
+                return !!APP.currentUser;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        // ==================== ROUTING ====================
+        function navigate(route) {
+            APP.currentRoute = route;
+            window.location.hash = route;
+            render();
+        }
+        
+        async function render() {
+            const route = window.location.hash || '#/login';
+            APP.currentRoute = route;
+
+            // Stop trading interval immediately when not on trading route
+            if (route !== '#/trading' && typeof stopTrading === 'function') {
+                stopTrading();
+            }
+            
+            // Check authentication
+            const publicRoutes = ['#/login', '#/register', '#/forgot-password'];
+            if (!publicRoutes.includes(route) && !(await checkAuth())) {
+                navigate('#/login');
+                return;
+            }
+            
+            // Render page
+            const app = $('#app');
+            
+            switch(route) {
+                case '#/login':
+                    app.innerHTML = renderLogin();
+                    break;
+                case '#/register':
+                    app.innerHTML = renderRegister();
+                    break;
+                case '#/forgot-password':
+                    app.innerHTML = renderForgotPassword();
+                    break;
+                case '#/dashboard':
+                    app.innerHTML = renderDashboard();
+                    setTimeout(initDashboardCharts, 100);
+                    // AUTO-SCROLL: if confirmation banner exists, scroll to it smoothly
+                    setTimeout(function() {
+                        const banner = document.getElementById('confirmationBanner');
+                        if (banner) {
+                            banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 350);
+                    break;
+                case '#/investments':
+                    app.innerHTML = renderInvestments();
+                    break;
+                case '#/exchange':
+                    app.innerHTML = renderExchange();
+                    break;
+                case '#/trading':
+                    app.innerHTML = renderTrading();
+                    setTimeout(initTradingCharts, 100);
+                    break;
+                case '#/referral':
+                    app.innerHTML = renderReferral();
+                    break;
+                case '#/wallet':
+                    app.innerHTML = renderWallet();
+                    break;
+                case '#/admin':
+                    if (isAnyAdmin()) {
+                        app.innerHTML = renderAdmin();
+                        setTimeout(initAdminCharts, 100);
+                    } else {
+                        navigate('#/dashboard');
+                    }
+                    break;
+                default:
+                    navigate('#/dashboard');
+            }
+        }
+        
+        // ==================== RENDER FUNCTIONS ====================
+        
+        // LOGIN PAGE
+        function renderLogin() {
+            return `
+                <div class="auth-container">
+                    <div class="auth-card">
+                        <div style="text-align: center; margin-bottom: 32px;">
+                            <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--accent) 0%, #5549E6 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
+                                🚀
+                            </div>
+                            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 8px;">Welcome Back</h1>
+                            <p style="color: var(--text-secondary);">Login to your SwiftCipher account</p>
+                        </div>
+                        
+                        <form onsubmit="handleLogin(event)">
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Email Address</label>
+                                <input type="email" class="input" placeholder="demo@swiftcipher.com" required id="loginEmail">
+                            </div>
+                            
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Password</label>
+                                <input type="password" class="input" placeholder="••••••••" required id="loginPassword">
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" style="width: 16px; height: 16px;">
+                                    <span style="font-size: 14px;">Remember me</span>
+                                </label>
+                                <a href="#/forgot-password" style="color: var(--accent); font-size: 14px; text-decoration: none;">Forgot Password?</a>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">
+                                Login
+                            </button>
+                            
+                            <div style="text-align: center;">
+                                <span style="color: var(--text-secondary); font-size: 14px;">Don't have an account?</span>
+                                <a href="#/register" style="color: var(--accent); font-weight: 600; margin-left: 4px; text-decoration: none;">Register</a>
+                            </div>
+                        </form>
+                        
+                        <div style="margin-top: 24px; padding: 16px; background: rgba(108, 99, 255, 0.1); border-radius: 12px; border: 1px solid rgba(108, 99, 255, 0.2);">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Demo Credentials:</p>
+                            <p style="font-size: 14px; font-weight: 600;">demo@swiftcipher.com</p>
+                            <p style="font-size: 14px; font-weight: 600;">Demo123!</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = $('#loginEmail').value;
+            const password = $('#loginPassword').value;
+
+            if (!email || !password) {
+                showToast('Please enter your email and password', 'error');
+                return;
+            }
+
+            // Show loading spinner
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner" style="margin: 0 auto;"></div>';
+            btn.disabled = true;
+
+            // Properly await the async login function
+            login(email, password)
+                .then(function(success) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                })
+                .catch(function(err) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    showToast('Login error. Please try again.', 'error');
+                });
+        }
+        
+        // REGISTER PAGE
+        function renderRegister() {
+            return `
+                <div class="auth-container">
+                    <div class="auth-card">
+                        <div style="text-align: center; margin-bottom: 32px;">
+                            <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--accent) 0%, #5549E6 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
+                                🚀
+                            </div>
+                            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 8px;">Create Account</h1>
+                            <p style="color: var(--text-secondary);">Start your crypto journey today</p>
+                        </div>
+                        
+                        <form onsubmit="handleRegister(event)">
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Full Name</label>
+                                <input type="text" class="input" placeholder="John Doe" required id="registerName">
+                            </div>
+                            
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Email Address</label>
+                                <input type="email" class="input" placeholder="john@example.com" required id="registerEmail">
+                            </div>
+                            
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Password</label>
+                                <input type="password" class="input" placeholder="••••••••" required id="registerPassword" oninput="checkPasswordStrength(this.value)">
+                                <div class="password-strength">
+                                    <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;" id="passwordStrengthText">Use 8+ characters with mix of letters, numbers & symbols</p>
+                            </div>
+                            
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Confirm Password</label>
+                                <input type="password" class="input" placeholder="••••••••" required id="registerConfirmPassword">
+                            </div>
+                            
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Referral Code (Optional)</label>
+                                <input type="text" class="input" placeholder="Enter referral code" id="registerReferralCode">
+                            </div>
+                            
+                            <div style="margin-bottom: 24px;">
+                                <label style="display: flex; align-items: start; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" style="width: 16px; height: 16px; margin-top: 2px;" required>
+                                    <span style="font-size: 14px;">I agree to the <a href="#" style="color: var(--accent); text-decoration: none;">Terms & Conditions</a> and <a href="#" style="color: var(--accent); text-decoration: none;">Privacy Policy</a></span>
+                                </label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">
+                                Create Account
+                            </button>
+                            
+                            <div style="text-align: center;">
+                                <span style="color: var(--text-secondary); font-size: 14px;">Already have an account?</span>
+                                <a href="#/login" style="color: var(--accent); font-weight: 600; margin-left: 4px; text-decoration: none;">Login</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function checkPasswordStrength(password) {
+            const bar = $('#passwordStrengthBar');
+            const text = $('#passwordStrengthText');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            
+            bar.className = 'password-strength-bar';
+            
+            if (strength < 2) {
+                bar.classList.add('weak');
+                text.textContent = 'Weak password';
+                text.style.color = 'var(--danger)';
+            } else if (strength < 4) {
+                bar.classList.add('medium');
+                text.textContent = 'Medium password';
+                text.style.color = 'var(--warning)';
+            } else {
+                bar.classList.add('strong');
+                text.textContent = 'Strong password';
+                text.style.color = 'var(--success)';
+            }
+        }
+        
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            const name = $('#registerName').value;
+            const email = $('#registerEmail').value;
+            const password = $('#registerPassword').value;
+            const confirmPassword = $('#registerConfirmPassword').value;
+            const referralCode = $('#registerReferralCode').value;
+            
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showToast('Password must be at least 8 characters', 'error');
+                return;
+            }
+            
+            // Show loading
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner" style="margin: 0 auto;"></div>';
+            btn.disabled = true;
+            
+            setTimeout(async () => {
+                try {
+                    await register({ name, email, password, referralCode });
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }, 500);
+        }
+        
+        // FORGOT PASSWORD PAGE
+        function renderForgotPassword() {
+            return `
+                <div class="auth-container">
+                    <div class="auth-card">
+                        <div style="text-align: center; margin-bottom: 32px;">
+                            <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--accent) 0%, #5549E6 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
+                                🔐
+                            </div>
+                            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 8px;">Forgot Password?</h1>
+                            <p style="color: var(--text-secondary);">Enter your email to reset your password</p>
+                        </div>
+                        
+                        <form onsubmit="handleForgotPassword(event)">
+                            <div style="margin-bottom: 24px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Email Address</label>
+                                <input type="email" class="input" placeholder="your@email.com" required id="forgotEmail">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">
+                                Send Reset Link
+                            </button>
+                            
+                            <div style="text-align: center;">
+                                <a href="#/login" style="color: var(--accent); font-weight: 600; text-decoration: none;">← Back to Login</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function handleForgotPassword(e) {
+            e.preventDefault();
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner" style="margin: 0 auto;"></div>';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                showToast('Password reset link sent to your email', 'success');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                setTimeout(() => navigate('#/login'), 2000);
+            }, 1000);
+        }
+        
+        // LAYOUT WRAPPER
+        function renderLayout(content, activeNav = 'dashboard') {
+            const user = APP.currentUser;
+            const isAdmin = isAnyAdmin();
+            
+            return `
+                <!-- Sidebar -->
+                <div class="sidebar" id="sidebar">
+                    <div class="sidebar-logo">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent) 0%, #5549E6 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                            🚀
+                        </div>
+                        <div>
+                            <div style="font-weight: 800; font-size: 18px;">SwiftCipher</div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">INVEST & TRADE</div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; overflow-y: auto;">
+                        <div class="nav-item ${activeNav === 'dashboard' ? 'active' : ''}" onclick="navigate('#/dashboard')">
+                            <span style="font-size: 20px;">📊</span>
+                            <span style="font-weight: 600;">Dashboard</span>
+                        </div>
+                        <div class="nav-item ${activeNav === 'investments' ? 'active' : ''}" onclick="navigate('#/investments')">
+                            <span style="font-size: 20px;">💼</span>
+                            <span style="font-weight: 600;">Investments</span>
+                        </div>
+                        <div class="nav-item ${activeNav === 'exchange' ? 'active' : ''}" onclick="navigate('#/exchange')">
+                            <span style="font-size: 20px;">🔄</span>
+                            <span style="font-weight: 600;">Exchange</span>
+                        </div>
+                        <div class="nav-item ${activeNav === 'trading' ? 'active' : ''}" onclick="navigate('#/trading')">
+                            <span style="font-size: 20px;">📈</span>
+                            <span style="font-weight: 600;">Trading</span>
+                        </div>
+                        <div class="nav-item ${activeNav === 'referral' ? 'active' : ''}" onclick="navigate('#/referral')">
+                            <span style="font-size: 20px;">🤝</span>
+                            <span style="font-weight: 600;">Referral</span>
+                        </div>
+                        <div class="nav-item ${activeNav === 'wallet' ? 'active' : ''}" onclick="navigate('#/wallet')">
+                            <span style="font-size: 20px;">💳</span>
+                            <span style="font-weight: 600;">Wallet</span>
+                        </div>
+                        <div class="nav-item ${activeNav === 'admin' ? 'active' : ''}" onclick="navigate('#/admin')" id="adminNavSidebarItem" style="display: ${isSuperAdmin() ? 'flex' : 'none'};">
+                            <span style="font-size: 20px;">⚙️</span>
+                            <span style="font-weight: 600;">Admin</span>
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-secondary); border-radius: 12px; margin-bottom: 12px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px;">
+                                ${user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${user.name}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${user.email}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger" style="width: 100%; font-size: 14px;" onclick="logout()">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="main-content" id="mainContent">
+                    <!-- Top Bar -->
+                    <div class="topbar">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <button class="btn-secondary" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 10px;" onclick="toggleSidebar()">
+                                ☰
+                            </button>
+                            <div class="sidebar-logo" style="display: none;" id="mobileLogo">
+                                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent) 0%, #5549E6 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                    🚀
+                                </div>
+                                <div style="font-weight: 800; font-size: 16px;">SwiftCipher</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <button class="btn-secondary" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 10px; position: relative;" onclick="showToast('No new notifications', 'info')">
+                                🔔
+                                <span style="position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; background: var(--danger); border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">3</span>
+                            </button>
+                            
+                            <button class="btn-secondary" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 20px;" onclick="toggleTheme()">
+                                ${APP.theme === 'dark' ? '🌙' : '☀️'}
+                            </button>
+                            
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px; cursor: pointer;">
+                                ${user.name.charAt(0).toUpperCase()}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${content}
+                </div>
+                
+                <!-- Mobile Bottom Navigation -->
+                <div class="bottom-nav">
+                    <div class="bottom-nav-item ${activeNav === 'dashboard' ? 'active' : ''}" onclick="navigate('#/dashboard')">
+                        <span style="font-size: 20px;">📊</span>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="bottom-nav-item ${activeNav === 'trading' ? 'active' : ''}" onclick="navigate('#/trading')">
+                        <span style="font-size: 20px;">📈</span>
+                        <span>Trade</span>
+                    </div>
+                    <div class="bottom-nav-item ${activeNav === 'exchange' ? 'active' : ''}" onclick="navigate('#/exchange')">
+                        <span style="font-size: 20px;">🔄</span>
+                        <span>Exchange</span>
+                    </div>
+                    <div class="bottom-nav-item ${activeNav === 'wallet' ? 'active' : ''}" onclick="navigate('#/wallet')">
+                        <span style="font-size: 20px;">💳</span>
+                        <span>Wallet</span>
+                    </div>
+                    <div class="bottom-nav-item" onclick="toggleSidebar()">
+                        <span style="font-size: 20px;">☰</span>
+                        <span>More</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function toggleSidebar() {
+            const sidebar = $('#sidebar');
+            sidebar.classList.toggle('open');
+        }
+        
+        function toggleTheme() {
+            APP.theme = APP.theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', APP.theme);
+            render();
+        }
+        
+        // DASHBOARD PAGE
+        function renderDashboard() {
+            const user = APP.currentUser;
+            // ===================== CONFIRMATION NOTIFICATION (RULE #5) =====================
+            // Check if admin has confirmed this user's investment since last dashboard visit
+            const confirmNotifyKey = 'sc_confirm_notify_' + user.id;
+            const hasConfirmNotify = localStorage.getItem(confirmNotifyKey) === '1';
+            if (hasConfirmNotify) {
+                // Clear the flag immediately so it only shows once
+                localStorage.removeItem(confirmNotifyKey);
+            }
+            const investments = getUserInvestmentsComputed(user.id);
+            const pendingPayments = getUserPendingPayments(user.id);
+            const trades = getTrades().filter(t => t.userId === user.id);
+            const referrals = getReferrals().filter(r => r.referrerId === user.id);
+            const transactions = getTransactions().filter(t => t.userId === user.id).slice(0, 5);
+            
+            // Calculate portfolio value
+            let portfolioValue = 0;
+            Object.keys(user.wallets).forEach(crypto => {
+                portfolioValue += user.wallets[crypto] * APP.prices[crypto];
+            });
+            portfolioValue += user.investmentWallet + user.referralWallet;
+            
+            // Calculate active investments
+            const activeInvestments = investments.filter(i => i.status === 'active');
+            const completedInvestments = investments.filter(i => i.status === 'completed');
+            const totalInvested = activeInvestments.reduce((sum, i) => sum + i.amount, 0);
+            
+            // Calculate referral earnings
+            const referralEarnings = referrals.reduce((sum, r) => sum + r.commission, 0);
+            
+            // Calculate trading P&L
+            const tradingPL = user.tradingBalance - user.tradingStarting;
+            
+            // Get time greeting
+            const hour = new Date().getHours();
+            const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+            
+            const content = `
+                <!-- Welcome Header -->
+                <div style="margin-bottom: 32px;">
+                    <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 8px;">${greeting}, ${user.name}! 👋</h1>
+                    <p style="color: var(--text-secondary); font-size: 16px;">${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
+                
+                <!-- ===== ADMIN CONFIRMATION BANNER (shown once after admin approves) ===== -->
+                ${hasConfirmNotify ? `
+                <div id="confirmationBanner" style="margin-bottom: 28px; padding: 20px 24px; background: linear-gradient(135deg, rgba(0,212,170,0.18) 0%, rgba(0,212,170,0.06) 100%); border: 1.5px solid rgba(0,212,170,0.4); border-radius: 16px; display:flex; align-items:center; gap:18px; animation: slideIn 0.4s ease;">
+                    <div style="font-size:36px;">✅</div>
+                    <div style="flex:1;">
+                        <div style="font-size:17px; font-weight:800; color:var(--success); margin-bottom:4px;">Investment Confirmed!</div>
+                        <div style="font-size:15px; color:var(--text-primary);">20% of your investment is now available for withdrawal.</div>
+                        <div style="font-size:13px; color:var(--text-secondary); margin-top:4px;">Your trading is now active and your investment is growing.</div>
+                    </div>
+                    <button onclick="document.getElementById('confirmationBanner').style.display='none'" style="width:32px;height:32px;border-radius:50%;background:rgba(0,212,170,0.15);border:1px solid rgba(0,212,170,0.3);cursor:pointer;font-size:18px;color:var(--success); display:flex;align-items:center;justify-content:center;">×</button>
+                </div>
+                ` : ''}
+                
+                <!-- Account & Investment Overview -->
+                <div class="grid-responsive-2" style="margin-bottom: 32px;">
+                    <div class="card">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">Registered Information</h3>
+                        <div style="display: grid; gap: 10px; font-size: 14px;">
+                            <div style="display:flex; justify-content: space-between; gap: 16px;"><span style="color: var(--text-secondary);">Name</span><span style="font-weight: 600;">${user.name}</span></div>
+                            <div style="display:flex; justify-content: space-between; gap: 16px;"><span style="color: var(--text-secondary);">Email</span><span style="font-weight: 600;">${user.email}</span></div>
+                            <div style="display:flex; justify-content: space-between; gap: 16px;"><span style="color: var(--text-secondary);">Role</span><span style="font-weight: 600; text-transform: capitalize;">${user.role.replace('_',' ')}</span></div>
+                            <div style="display:flex; justify-content: space-between; gap: 16px;"><span style="color: var(--text-secondary);">Joined</span><span style="font-weight: 600;">${formatDate(user.createdAt)}</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">Investment Details</h3>
+                        ${(() => {
+                            const s = getWalletInvestmentSummary(user.id);
+                            const active = s.investments.filter(i=>i.status==='active');
+                            const completed = s.investments.filter(i=>i.status==='completed');
+                            const pending = getUserPendingPayments(user.id);
+                            return `
+                                <div style="display:grid; gap: 10px;">
+                                    ${(() => {
+                                        const rejected = getInvestmentPayments().filter(p => p.userId === user.id && p.status === 'rejected');
+                                        const dbInv    = (APP.currentUser && APP.currentUser._dbInvestment) || {};
+                                        const hasActive    = active.length > 0;
+                                        const hasCompleted = completed.length > 0;
+                                        let statusText;
+                                        if (hasCompleted) statusText = 'Completed';
+                                        else if (hasActive) statusText = 'Active';
+                                        else if (pending.length > 0) statusText = 'Pending';
+                                        else if (rejected.length > 0) statusText = 'Rejected';
+                                        else statusText = 'None';
+                                        return `<div style="display:flex; justify-content: space-between; gap: 16px;"><span style="color: var(--text-secondary);">Status</span><span style="font-weight:700;">${statusText}</span></div>`;
+                                    })()}
+                                    <div style="display:flex; justify-content: space-between; gap: 16px;"><span style="color: var(--text-secondary);">Investment Amount</span><span style="font-weight:700;">${formatCurrency(s.totalInvested)}</span></div>
+                                    <div style="display:flex; justify-content: space-between; gap: 16px;"><span style="color: var(--text-secondary);">Interest Accrued</span><span style="font-weight:700; color: var(--success);" id="dashInterestAccrued">${formatCurrency(s.interestEarned)}</span></div>
+                                    <div style="display:flex; justify-content: space-between; gap: 16px;"><span style="color: var(--text-secondary);">Pending Payments</span><span style="font-weight:700;">${formatCurrency(s.pendingPayments)}</span></div>
+                                    ${s.totalInvested > 0 ? `
+                                    <div style="display:flex; justify-content: space-between; gap: 16px;">
+                                        <span style="color: var(--text-secondary);">Growth Status</span>
+                                        <span class="inv-engine-status" style="font-weight:700; color: ${s.investments.some(i=>i.status==='completed') ? 'var(--success)' : 'var(--warning)'}">
+                                            ${s.investments.some(i=>i.status==='completed') ? '✅ Completed' : s.investments.some(i=>i.status==='active') ? '⏳ In Progress' : '⏸ Pending Approval'}
+                                        </span>
+                                    </div>` : ''}
+                                </div>
+                            `;
+                        })()}
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid-responsive" style="margin-bottom: 32px;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(108, 99, 255, 0.1);">
+                            💰
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Total Portfolio</div>
+                            <div style="font-size: 28px; font-weight: 800;">${formatCurrency(portfolioValue)}</div>
+                            <div style="font-size: 14px; color: var(--success); margin-top: 4px;">+12.5% this month</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(0, 212, 170, 0.1);">
+                            📈
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Active Investments</div>
+                            <div style="font-size: 28px; font-weight: 800;">${activeInvestments.length}</div>
+                            <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">${formatCurrency(totalInvested)} invested</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(255, 165, 2, 0.1);">
+                            🤝
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Referral Earnings</div>
+                            <div style="font-size: 28px; font-weight: 800;">${formatCurrency(referralEarnings)}</div>
+                            <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">${referrals.length} referrals</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: ${tradingPL >= 0 ? 'rgba(0, 212, 170, 0.1)' : 'rgba(255, 71, 87, 0.1)'};">
+                            📊
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Trading P&L</div>
+                            <div style="font-size: 28px; font-weight: 800; color: ${tradingPL >= 0 ? 'var(--success)' : 'var(--danger)'};">${formatCurrency(tradingPL)}</div>
+                            <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">${formatCurrency(user.tradingBalance)} balance</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Live Price Ticker -->
+                <div class="ticker">
+                    <div class="ticker-content">
+                        ${['BTC', 'ETH', 'BNB', 'SOL', 'ADA', 'USDT', 'BTC', 'ETH', 'BNB', 'SOL', 'ADA', 'USDT'].map(crypto => `
+                            <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                <span style="font-weight: 700;">${crypto}</span>
+                                <span data-price="${crypto}">${formatCurrency(APP.prices[crypto])}</span>
+                                <span style="color: ${Math.random() > 0.5 ? 'var(--success)' : 'var(--danger)'}; font-size: 12px;">
+                                    ${Math.random() > 0.5 ? '▲' : '▼'} ${(Math.random() * 5).toFixed(2)}%
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <!-- Charts Section -->
+                <div class="grid-responsive-2" style="margin-bottom: 32px;">
+                    <div class="card">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">Portfolio Distribution</h3>
+                        <canvas id="portfolioChart" style="max-height: 300px;"></canvas>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">BTC Price (30 Days)</h3>
+                        <canvas id="btcPriceChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Market Snapshot -->
+                <div style="margin-bottom: 32px;">
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Market Snapshot</h3>
+                    <div class="grid-responsive-3">
+                        ${['BTC', 'ETH', 'BNB', 'SOL', 'ADA', 'USDT'].map(crypto => {
+                            const change = (Math.random() - 0.5) * 10;
+                            const isPositive = change >= 0;
+                            return `
+                                <div class="card" style="cursor: pointer;" onclick="navigate('#/exchange')">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                        <div>
+                                            <div style="font-size: 24px; margin-bottom: 4px;">${crypto === 'BTC' ? '₿' : crypto === 'ETH' ? 'Ξ' : crypto === 'BNB' ? '🔸' : crypto === 'SOL' ? '◎' : crypto === 'ADA' ? '₳' : '₮'}</div>
+                                            <div style="font-weight: 700; font-size: 16px;">${crypto}</div>
+                                        </div>
+                                        <div class="badge ${isPositive ? 'badge-success' : 'badge-danger'}">
+                                            ${isPositive ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px;" data-price="${crypto}">${formatCurrency(APP.prices[crypto])}</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">24h Volume: ${formatCurrency(Math.random() * 1000000000)}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div style="margin-bottom: 32px;">
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Quick Actions</h3>
+                    <div class="grid-responsive">
+                        <button class="btn btn-primary" onclick="navigate('#/investments')" style="padding: 20px; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                            <span style="font-size: 24px;">💼</span>
+                            <span style="font-weight: 700;">Invest Now</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="navigate('#/exchange')" style="padding: 20px; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                            <span style="font-size: 24px;">🔄</span>
+                            <span style="font-weight: 700;">Swap Crypto</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="navigate('#/trading')" style="padding: 20px; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                            <span style="font-size: 24px;">📈</span>
+                            <span style="font-weight: 700;">Start Trading</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="navigate('#/referral')" style="padding: 20px; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                            <span style="font-size: 24px;">🤝</span>
+                            <span style="font-weight: 700;">Refer & Earn</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Recent Transactions -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 style="font-size: 20px; font-weight: 700;">Recent Transactions</h3>
+                        <a href="#/wallet" style="color: var(--accent); text-decoration: none; font-weight: 600;">View All →</a>
+                    </div>
+                    
+                    ${transactions.length > 0 ? `
+                        <div style="overflow-x: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Details</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${transactions.map(tx => `
+                                        <tr>
+                                            <td>
+                                                <span style="font-weight: 600; text-transform: capitalize;">${tx.type.replace('_', ' ')}</span>
+                                            </td>
+                                            <td style="color: var(--text-secondary);">
+                                                ${tx.currency ? tx.currency : ''}
+                                                ${tx.fromCurrency ? tx.fromCurrency + ' → ' + tx.toCurrency : ''}
+                                                ${tx.plan ? tx.plan + ' Plan' : ''}
+                                                ${tx.pair ? tx.pair : ''}
+                                            </td>
+                                            <td style="font-weight: 700;">
+                                                ${tx.amount ? formatCurrency(tx.amount) : ''}
+                                                ${tx.profit ? formatCurrency(tx.profit) : ''}
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-success">${tx.status}</span>
+                                            </td>
+                                            <td style="color: var(--text-secondary);">
+                                                ${formatDate(tx.createdAt)}
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : `
+                        <div style="text-align: center; padding: 48px; color: var(--text-secondary);">
+                            <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+                            <div style="font-size: 16px;">No transactions yet</div>
+                        </div>
+                    `}
+                </div>
+            `;
+            
+            return renderLayout(content, 'dashboard');
+        }
+        
+        function initDashboardCharts() {
+            const user = APP.currentUser;
+            
+            // Portfolio Distribution Chart
+            let portfolioData = [];
+            let portfolioLabels = [];
+            
+            Object.keys(user.wallets).forEach(crypto => {
+                const value = user.wallets[crypto] * APP.prices[crypto];
+                if (value > 0) {
+                    portfolioData.push(value);
+                    portfolioLabels.push(crypto);
+                }
+            });
+            
+            if (user.investmentWallet > 0) {
+                portfolioData.push(user.investmentWallet);
+                portfolioLabels.push('Investments');
+            }
+            
+            if (user.referralWallet > 0) {
+                portfolioData.push(user.referralWallet);
+                portfolioLabels.push('Referrals');
+            }
+            
+            const portfolioCtx = document.getElementById('portfolioChart');
+            if (portfolioCtx) {
+                APP.charts.portfolio = new Chart(portfolioCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: portfolioLabels,
+                        datasets: [{
+                            data: portfolioData,
+                            backgroundColor: [
+                                '#6C63FF',
+                                '#5549E6',
+                                '#00D4AA',
+                                '#FFA502',
+                                '#FF4757',
+                                '#3742FA',
+                                '#2ED573'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                                    padding: 15,
+                                    font: {
+                                        size: 12,
+                                        weight: '600'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // BTC Price Chart (30 days)
+            const btcDays = [];
+            const btcPrices = [];
+            const basePrice = APP.prices.BTC;
+            
+            for (let i = 29; i >= 0; i--) {
+                btcDays.push(new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                btcPrices.push(basePrice * (0.85 + Math.random() * 0.3));
+            }
+            
+            const btcCtx = document.getElementById('btcPriceChart');
+            if (btcCtx) {
+                APP.charts.btcPrice = new Chart(btcCtx, {
+                    type: 'line',
+                    data: {
+                        labels: btcDays,
+                        datasets: [{
+                            label: 'BTC Price',
+                            data: btcPrices,
+                            borderColor: '#6C63FF',
+                            backgroundColor: 'rgba(108, 99, 255, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
+                                    maxRotation: 0
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: getComputedStyle(document.documentElement).getPropertyValue('--border')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
+                                    callback: function(value) {
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // INVESTMENTS PAGE
+        function renderInvestments() {
+            const user = APP.currentUser;
+            const investments = getUserInvestmentsComputed(user.id);
+            const pendingPayments = getUserPendingPayments(user.id);
+            const activeInvestments = investments.filter(i => i.status === 'active');
+            const completedInvestments = investments.filter(i => i.status === 'completed');
+            
+            const plans = [
+                { name: 'Starter', min: 100, max: 999, dailyROI: 0.05, duration: 7, maxReturn: 35, badge: 'MOST POPULAR', badgeColor: 'var(--success)' },
+                { name: 'Growth', min: 1000, max: 4999, dailyROI: 0.08, duration: 14, maxReturn: 112, badge: 'BEST VALUE', badgeColor: 'var(--accent)' },
+                { name: 'Premium', min: 5000, max: 19999, dailyROI: 0.12, duration: 30, maxReturn: 360, badge: 'PRO', badgeColor: 'var(--warning)' },
+                { name: 'Elite', min: 20000, max: 999999, dailyROI: 0.18, duration: 60, maxReturn: 1080, badge: 'VIP', badgeColor: '#FF4757' }
+            ];
+            
+            const totalInvested = investments.reduce((sum, i) => sum + i.amount, 0);
+            const totalEarned = completedInvestments.reduce((sum, i) => sum + i.amount, 0);
+            
+            const content = `
+                <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 8px;">Investment Plans</h1>
+                <p style="color: var(--text-secondary); font-size: 16px; margin-bottom: 32px;">Choose your investment plan and start earning daily returns</p>
+                
+                <!-- Investment Plans -->
+                <div class="grid-responsive" style="margin-bottom: 48px;">
+                    ${plans.map(plan => `
+                        <div class="card" style="position: relative; background: linear-gradient(135deg, var(--bg-card) 0%, rgba(108, 99, 255, 0.05) 100%);">
+                            ${plan.badge ? `
+                                <div style="position: absolute; top: 16px; right: 16px; background: ${plan.badgeColor}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;">
+                                    ${plan.badge}
+                                </div>
+                            ` : ''}
+                            
+                            <div style="font-size: 32px; margin-bottom: 12px;">💎</div>
+                            <h3 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">${plan.name}</h3>
+                            <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">
+                                ${formatCurrency(plan.min)} - ${formatCurrency(plan.max)}
+                            </div>
+                            
+                            <div style="padding: 16px; background: var(--bg-secondary); border-radius: 12px; margin-bottom: 16px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                                    <span style="color: var(--text-secondary);">Daily ROI</span>
+                                    <span style="font-weight: 700; color: var(--success);">${(plan.dailyROI * 100).toFixed(1)}%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                                    <span style="color: var(--text-secondary);">Duration</span>
+                                    <span style="font-weight: 700;">${plan.duration} days</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--text-secondary);">Max Return</span>
+                                    <span style="font-weight: 700; color: var(--accent);">${plan.maxReturn}%</span>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-primary" style="width: 100%;" onclick="openInvestModal('${plan.name}', ${plan.min}, ${plan.max}, ${plan.dailyROI}, ${plan.duration})">
+                                Invest Now
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <!-- Earnings Summary -->
+                <div class="grid-responsive-3" style="margin-bottom: 32px;">
+                    <div class="stat-card">
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Total Invested</div>
+                        <div style="font-size: 28px; font-weight: 800;">${formatCurrency(totalInvested)}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Total Earned</div>
+                        <div style="font-size: 28px; font-weight: 800; color: var(--success);">${formatCurrency(totalEarned)}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Active Plans</div>
+                        <div style="font-size: 28px; font-weight: 800;">${activeInvestments.length}</div>
+                    </div>
+                </div>
+                
+                <!-- Active Investments -->
+                ${activeInvestments.length > 0 ? `
+                    <div class="card" style="margin-bottom: 32px;">
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 24px;">Active Investments</h3>
+                        <div style="display: grid; gap: 16px;">
+                            ${activeInvestments.map(inv => {
+                                const progress = (inv.daysElapsed / inv.duration) * 100;
+                                const earned = inv.interestAccrued; // per-minute profit earned
+                                const remaining = Math.max(0, Math.ceil(inv.duration - inv.daysElapsed));
+                                
+                                return `
+                                    <div style="padding: 20px; background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border);">
+                                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                                            <div>
+                                                <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">${inv.plan} Plan</div>
+                                                <div style="font-size: 14px; color: var(--text-secondary);">Invested: ${formatCurrency(inv.amount)}</div>
+                                            </div>
+                                            <div class="badge badge-success">Active</div>
+                                        </div>
+                                        
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                                            <div>
+                                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Earned</div>
+                                                <div style="font-size: 16px; font-weight: 700; color: var(--success);">${formatCurrency(earned)}</div>
+                                            </div>
+                                            <div>
+                                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Days Left</div>
+                                                <div style="font-size: 16px; font-weight: 700;">${remaining} days</div>
+                                            </div>
+                                            <div>
+                                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Daily ROI</div>
+                                                <div style="font-size: 16px; font-weight: 700; color: var(--accent);">${(inv.dailyROI * 100).toFixed(1)}%</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                                <span style="font-size: 12px; color: var(--text-secondary);">Progress</span>
+                                                <span style="font-size: 12px; font-weight: 600;">${Math.floor(inv.daysElapsed)}/${inv.duration} days</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: ${progress}%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <!-- Investment History -->
+                <div class="card">
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Investment History</h3>
+                    ${investments.length > 0 ? `
+                        <div style="overflow-x: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Plan</th>
+                                        <th>Amount</th>
+                                        <th>Daily ROI</th>
+                                        <th>Duration</th>
+                                        <th>Earned</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${investments.map(inv => {
+                                        const earned = inv.interestAccrued; // final liveProfitLoss caps at 100%
+                                        return `
+                                            <tr>
+                                                <td style="font-weight: 600;">${inv.plan}</td>
+                                                <td style="font-weight: 700;">${formatCurrency(inv.amount)}</td>
+                                                <td style="color: var(--accent);">${(inv.dailyROI * 100).toFixed(1)}%</td>
+                                                <td>${inv.duration} days</td>
+                                                <td style="font-weight: 700; color: var(--success);">${formatCurrency(earned)}</td>
+                                                <td>
+                                                    <span class="badge ${inv.status === 'active' ? 'badge-success' : 'badge-primary'}">
+                                                        ${inv.status}
+                                                    </span>
+                                                </td>
+                                                <td style="color: var(--text-secondary);">${formatDate(inv.startDate)}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : `
+                        <div style="text-align: center; padding: 48px; color: var(--text-secondary);">
+                            <div style="font-size: 48px; margin-bottom: 16px;">💼</div>
+                            <div style="font-size: 16px;">No investments yet</div>
+                        </div>
+                    `}
+                </div>
+                
+                <!-- Investment Modal -->
+                <div id="investModal" style="display: none;"></div>
+            `;
+            
+            return renderLayout(content, 'investments');
+        }
+        
+        function openInvestModal(plan, min, max, dailyROI, duration) {
+            const modal = $('#investModal');
+            modal.style.display = 'flex';
+            
+            modal.innerHTML = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                            <h3 style="font-size: 24px; font-weight: 800;">Invest in ${plan} Plan</h3>
+                            <button onclick="closeInvestModal()" style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-secondary); border: none; cursor: pointer; font-size: 20px;">×</button>
+                        </div>
+                        
+                        <div style="padding: 16px; background: var(--bg-secondary); border-radius: 12px; margin-bottom: 24px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                                <span>Daily ROI</span>
+                                <span style="font-weight: 700; color: var(--success);">${(dailyROI * 100).toFixed(1)}%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                                <span>Duration</span>
+                                <span style="font-weight: 700;">${duration} days</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Range</span>
+                                <span style="font-weight: 700;">${formatCurrency(min)} - ${formatCurrency(max)}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Investment Amount</label>
+                            <input type="number" class="input" placeholder="Enter amount" id="investAmount" min="${min}" max="${max}" oninput="calculateInvestmentReturn(${dailyROI}, ${duration})">
+                        </div>
+                        
+                        <div id="investmentCalc" style="padding: 16px; background: rgba(108, 99, 255, 0.1); border-radius: 12px; margin-bottom: 24px; display: none;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: var(--text-secondary);">Daily Profit</span>
+                                <span id="dailyProfit" style="font-weight: 700; color: var(--success);">$0.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-secondary);">Total Return</span>
+                                <span id="totalReturn" style="font-weight: 700; color: var(--accent); font-size: 18px;">$0.00</span>
+                            </div>
+                        </div>
+                        
+                        
+                        <div style="padding: 16px; background: var(--bg-secondary); border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border);">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">SELECT COIN &amp; PAYMENT ADDRESS</div>
+                            <div style="margin-bottom: 10px;">
+                                <select class="input" id="investmentCoinSelect" onchange="updateInvestmentPaymentAddress()" style="margin-bottom: 8px;">
+                                    <option value="Bitcoin">Bitcoin (BTC)</option>
+                                    <option value="USDT" selected>USDT (ERC20)</option>
+                                    <option value="Ethereum">Ethereum (ETH)</option>
+                                    <option value="Smart Chain (BEP20)">Smart Chain (BEP20)</option>
+                                    <option value="Solana">Solana (SOL)</option>
+                                    <option value="ADA (Cardano)">ADA (Cardano)</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" class="input" value="0x91160439d1b3efe9bc7ef3562047e731a3969af5" readonly id="investmentPaymentAddress" style="flex: 1; font-family: monospace; font-size: 13px;">
+                                <button class="btn btn-secondary" onclick="copyInvestmentPaymentAddress()">Copy</button>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">Upload your receipt and submit for manual confirmation.</div>
+                        </div>
+                        
+                        <input type="file" id="receiptFileInput" accept="image/*,application/pdf" style="display:none" onchange="handleReceiptSelected(event)">
+                        <a class="btn btn-primary" style="width: 100%; display: block; text-align: center; margin-bottom: 12px;" href="javascript:void(0)" onclick="triggerReceiptUpload()">
+                            Upload Receipt
+                        </a>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="confirmInvestment('${plan}', ${min}, ${max}, ${dailyROI}, ${duration})">
+                            Confirm Investment
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function closeInvestModal() {
+            const modal = $('#investModal');
+            modal.style.display = 'none';
+        }
+
+        function updateInvestmentPaymentAddress() {
+            const sel = document.getElementById('investmentCoinSelect');
+            const inp = document.getElementById('investmentPaymentAddress');
+            if (!sel || !inp) return;
+            inp.value = COIN_ADDRESSES[sel.value] || '';
+        }
+        window.updateInvestmentPaymentAddress = updateInvestmentPaymentAddress;
+
+        function copyInvestmentPaymentAddress() {
+            const el = $('#investmentPaymentAddress');
+            if (!el) return;
+            el.select();
+            document.execCommand('copy');
+            showToast('Payment address copied to clipboard!', 'success');
+        }
+
+        // ==================== RECEIPT UPLOAD (PLAIN) ====================
+        function triggerReceiptUpload() {
+            const input = document.getElementById('receiptFileInput');
+            if (!input) {
+                showToast('Receipt upload is unavailable. Please reopen the modal.', 'error');
+                return;
+            }
+            input.click();
+        }
+
+        function handleReceiptSelected(event) {
+            const file = event?.target?.files?.[0];
+            if (!file) return;
+
+            const isImage = file.type && file.type.startsWith('image/');
+            const isPdf = file.type === 'application/pdf' || (file.name || '').toLowerCase().endsWith('.pdf');
+            if (!isImage && !isPdf) {
+                showToast('Please upload an image or PDF receipt.', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            // Keep in-memory draft until user confirms investment
+            const reader = new FileReader();
+            reader.onload = () => {
+                APP.receiptDraft = {
+                    name: file.name,
+                    type: file.type || (isPdf ? 'application/pdf' : 'image/*'),
+                    size: file.size,
+                    dataUrl: reader.result
+                };
+
+                // Persist receipt draft locally (plain static hosting)
+                try {
+                    const amt = parseFloat(document.getElementById('investAmount')?.value) || 0;
+                    localStorage.setItem('cryptonexus_receiptDraft_' + APP.currentUser.id, JSON.stringify({
+                        userId: APP.currentUser.id,
+                        name: APP.currentUser.name,
+                        email: APP.currentUser.email,
+                        investmentAmount: amt,
+                        receiptFile: reader.result,
+                        fileName: file.name,
+                        fileType: file.type || (isPdf ? 'application/pdf' : 'image/*'),
+                        fileSize: file.size,
+                        timestamp: Date.now(),
+                        status: 'Pending'
+                    }));
+                } catch (e) {}
+
+                showToast('Receipt uploaded. You can now confirm investment.', 'success');
+            };
+            reader.onerror = () => {
+                showToast('Failed to read receipt file. Please try again.', 'error');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        window.triggerReceiptUpload = triggerReceiptUpload;
+        window.handleReceiptSelected = handleReceiptSelected;
+
+        
+        function calculateInvestmentReturn(dailyROI, duration) {
+            const amount = parseFloat($('#investAmount').value) || 0;
+            const calc = $('#investmentCalc');
+            
+            if (amount > 0) {
+                calc.style.display = 'block';
+
+                // Plan rule: total profit = amount × (dailyROI × duration)
+                const totalProfit = amount * (dailyROI * duration);
+                const dailyProfit = amount * dailyROI;
+                const totalReturn = amount + totalProfit;
+                
+                $('#dailyProfit').textContent = formatCurrency(dailyProfit);
+                $('#totalReturn').textContent = formatCurrency(totalReturn);
+            } else {
+                calc.style.display = 'none';
+            }
+        }
+        
+        function confirmInvestment(plan, min, max, dailyROI, duration) {
+            const amount = parseFloat($('#investAmount').value);
+            
+            if (!amount || amount < min || amount > max) {
+                showToast(`Amount must be between ${formatCurrency(min)} and ${formatCurrency(max)}`, 'error');
+                return;
+            }
+
+            // 💳 PAYMENT FLOW (PLAIN): receipt upload is required
+            if ((!APP.receiptDraft || !APP.receiptDraft.dataUrl) && APP.currentUser) {
+                try {
+                    const saved = localStorage.getItem('cryptonexus_receiptDraft_' + APP.currentUser.id);
+                    if (saved) {
+                        const d = JSON.parse(saved);
+                        APP.receiptDraft = {
+                            name: d.fileName || d.name || 'receipt',
+                            type: d.fileType || 'image/*',
+                            size: d.fileSize || 0,
+                            dataUrl: d.receiptFile
+                        };
+                    }
+                } catch (e) {}
+            }
+
+            if (!APP.receiptDraft || !APP.receiptDraft.dataUrl) {
+                showToast('Please upload your receipt before confirming.', 'error');
+                return;
+            }
+            
+            // Create a pending payment request (manual confirmation by Super Admin)
+            const payments = getInvestmentPayments();
+            const paymentId = generateId();
+            const ts = Date.now();
+            payments.unshift({
+                // REQUIRED RECEIPT STORAGE (LOCALSTORAGE ONLY)
+                id: paymentId,
+                userId: APP.currentUser.id,
+                name: APP.currentUser.name,
+                email: APP.currentUser.email,
+                investmentAmount: amount,
+                receiptFile: APP.receiptDraft.dataUrl,
+                timestamp: ts,
+
+                // keep existing fields used by UI
+                plan,
+                amount,
+                dailyROI,
+                duration,
+                paymentAddress: PAYMENT_ADDRESS,
+
+                // internal status + human status
+                status: 'Pending',
+                receiptStatus: 'Pending',
+                investmentStatus: 'INACTIVE',
+
+                // receipt viewer (kept for existing admin modal)
+                receipt: {
+                    name: APP.receiptDraft.name,
+                    type: APP.receiptDraft.type,
+                    size: APP.receiptDraft.size,
+                    dataUrl: APP.receiptDraft.dataUrl
+                },
+                createdAt: ts,
+                confirmedAt: null,
+                confirmedBy: null,
+                rejectedAt: null,
+                rejectedBy: null
+            });
+            saveInvestmentPayments(payments);
+
+            // Clear draft after submission
+            APP.receiptDraft = null;
+            try { localStorage.removeItem('cryptonexus_receiptDraft_' + APP.currentUser.id); } catch (e) {}
+            
+            // Add transaction as PENDING
+            addTransaction({
+                type: 'investment_payment',
+                amount,
+                plan,
+                status: 'Pending',
+                paymentId,
+                paymentAddress: PAYMENT_ADDRESS
+            });
+            
+            closeInvestModal();
+            showToast('Receipt submitted. Waiting for Super Admin approval.', 'info');
+            setTimeout(() => render(), 500);
+        }
+        
+        // EXCHANGE PAGE
+        function renderExchange() {
+            const transactions = getTransactions().filter(t => t.userId === APP.currentUser.id && t.type === 'swap');
+            
+            const content = `
+                <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 8px;">Exchange Crypto</h1>
+                <p style="color: var(--text-secondary); font-size: 16px; margin-bottom: 32px;">Swap your cryptocurrencies instantly with low fees</p>
+                
+                <div class="grid-responsive-2" style="margin-bottom: 32px;">
+                    <!-- Exchange Form -->
+                    <div class="card" style="position: sticky; top: 24px;">
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 24px;">Swap Crypto</h3>
+                        
+                        <!-- You Pay -->
+                        <div style="padding: 20px; background: var(--bg-secondary); border-radius: 12px; margin-bottom: 16px;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; font-weight: 600;">YOU PAY</div>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <input type="number" class="input" placeholder="0.00" id="fromAmount" oninput="calculateExchange()" style="flex: 1; font-size: 24px; font-weight: 700; padding: 8px 12px;">
+                                <select class="input" id="fromCrypto" onchange="calculateExchange()" style="width: 120px; font-weight: 600;">
+                                    <option value="BTC">BTC</option>
+                                    <option value="ETH">ETH</option>
+                                    <option value="BNB">BNB</option>
+                                    <option value="SOL">SOL</option>
+                                    <option value="ADA">ADA</option>
+                                    <option value="USDT" selected>USDT</option>
+                                </select>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+                                Balance: <span id="fromBalance" style="font-weight: 600;">0.00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Swap Button -->
+                        <div style="text-align: center; margin: -8px 0;">
+                            <button class="btn-secondary" style="width: 48px; height: 48px; padding: 0; border-radius: 50%; font-size: 24px;" onclick="swapCurrencies()">
+                                ⇅
+                            </button>
+                        </div>
+                        
+                        <!-- You Receive -->
+                        <div style="padding: 20px; background: var(--bg-secondary); border-radius: 12px; margin-bottom: 16px; margin-top: -8px;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; font-weight: 600;">YOU RECEIVE</div>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div class="input" style="flex: 1; font-size: 24px; font-weight: 700; padding: 8px 12px; background: transparent; border: none;" id="toAmount">0.00</div>
+                                <select class="input" id="toCrypto" onchange="calculateExchange()" style="width: 120px; font-weight: 600;">
+                                    <option value="BTC" selected>BTC</option>
+                                    <option value="ETH">ETH</option>
+                                    <option value="BNB">BNB</option>
+                                    <option value="SOL">SOL</option>
+                                    <option value="ADA">ADA</option>
+                                    <option value="USDT">USDT</option>
+                                </select>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+                                Balance: <span id="toBalance" style="font-weight: 600;">0.00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Exchange Info -->
+                        <div style="padding: 16px; background: rgba(108, 99, 255, 0.1); border-radius: 12px; margin-bottom: 24px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="font-size: 14px; color: var(--text-secondary);">Exchange Rate</span>
+                                <span id="exchangeRate" style="font-size: 14px; font-weight: 600;">1 USDT = 0.0000148 BTC</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="font-size: 14px; color: var(--text-secondary);">Fee (0.5%)</span>
+                                <span id="exchangeFee" style="font-size: 14px; font-weight: 600;">$0.00</span>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width: 100%;" onclick="openSwapConfirmModal()">
+                            Swap Now
+                        </button>
+                    </div>
+                    
+                    <!-- Swap History -->
+                    <div class="card">
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Swap History</h3>
+                        ${transactions.length > 0 ? `
+                            <div style="overflow-x: auto;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Rate</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${transactions.map(tx => `
+                                            <tr>
+                                                <td style="font-weight: 600;">${formatCrypto(tx.fromAmount, 6)} ${tx.fromCurrency}</td>
+                                                <td style="font-weight: 600; color: var(--success);">${formatCrypto(tx.toAmount, 6)} ${tx.toCurrency}</td>
+                                                <td style="color: var(--text-secondary); font-size: 14px;">
+                                                    1 ${tx.fromCurrency} = ${formatCrypto(tx.toAmount / tx.fromAmount, 8)} ${tx.toCurrency}
+                                                </td>
+                                                <td><span class="badge badge-success">${tx.status}</span></td>
+                                                <td style="color: var(--text-secondary);">${formatDateTime(tx.createdAt)}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ` : `
+                            <div style="text-align: center; padding: 48px; color: var(--text-secondary);">
+                                <div style="font-size: 48px; margin-bottom: 16px;">🔄</div>
+                                <div style="font-size: 16px;">No swap history yet</div>
+                            </div>
+                        `}
+                    </div>
+                </div>
+                
+                <!-- Swap Confirm Modal -->
+                <div id="swapModal" style="display: none;"></div>
+            `;
+            
+            const layout = renderLayout(content, 'exchange');
+            setTimeout(() => {
+                updateExchangeBalances();
+                calculateExchange();
+            }, 100);
+            return layout;
+        }
+        
+        function updateExchangeBalances() {
+            const fromCrypto = $('#fromCrypto')?.value || 'USDT';
+            const toCrypto = $('#toCrypto')?.value || 'BTC';
+            
+            const fromBalance = $('#fromBalance');
+            const toBalance = $('#toBalance');
+            
+            if (fromBalance) fromBalance.textContent = formatCrypto(APP.currentUser.wallets[fromCrypto] || 0, 6);
+            if (toBalance) toBalance.textContent = formatCrypto(APP.currentUser.wallets[toCrypto] || 0, 6);
+        }
+        
+        function calculateExchange() {
+            const fromAmount = parseFloat($('#fromAmount')?.value) || 0;
+            const fromCrypto = $('#fromCrypto')?.value || 'USDT';
+            const toCrypto = $('#toCrypto')?.value || 'BTC';
+            
+            if (fromAmount > 0 && fromCrypto !== toCrypto) {
+                const fromValue = fromAmount * APP.prices[fromCrypto];
+                const fee = fromValue * 0.005; // 0.5% fee
+                const toValue = fromValue - fee;
+                const toAmount = toValue / APP.prices[toCrypto];
+                
+                const toAmountEl = $('#toAmount');
+                const exchangeRate = $('#exchangeRate');
+                const exchangeFee = $('#exchangeFee');
+                
+                if (toAmountEl) toAmountEl.textContent = formatCrypto(toAmount, 8);
+                if (exchangeRate) exchangeRate.textContent = `1 ${fromCrypto} = ${formatCrypto(APP.prices[fromCrypto] / APP.prices[toCrypto], 8)} ${toCrypto}`;
+                if (exchangeFee) exchangeFee.textContent = formatCurrency(fee);
+            }
+            
+            updateExchangeBalances();
+        }
+        
+        function swapCurrencies() {
+            const fromCrypto = $('#fromCrypto');
+            const toCrypto = $('#toCrypto');
+            
+            if (fromCrypto && toCrypto) {
+                const temp = fromCrypto.value;
+                fromCrypto.value = toCrypto.value;
+                toCrypto.value = temp;
+                
+                $('#fromAmount').value = '';
+                calculateExchange();
+            }
+        }
+        
+        function openSwapConfirmModal() {
+            const fromAmount = parseFloat($('#fromAmount')?.value) || 0;
+            const fromCrypto = $('#fromCrypto')?.value || 'USDT';
+            const toCrypto = $('#toCrypto')?.value || 'BTC';
+            
+            if (fromAmount <= 0) {
+                showToast('Please enter amount to swap', 'error');
+                return;
+            }
+            
+            if (fromCrypto === toCrypto) {
+                showToast('Please select different cryptocurrencies', 'error');
+                return;
+            }
+            
+            if (APP.currentUser.wallets[fromCrypto] < fromAmount) {
+                showToast('Insufficient balance', 'error');
+                return;
+            }
+            
+            const fromValue = fromAmount * APP.prices[fromCrypto];
+            const fee = fromValue * 0.005;
+            const toValue = fromValue - fee;
+            const toAmount = toValue / APP.prices[toCrypto];
+            
+            const modal = $('#swapModal');
+            modal.style.display = 'flex';
+            
+            modal.innerHTML = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <h3 style="font-size: 24px; font-weight: 800; margin-bottom: 24px; text-align: center;">Confirm Swap</h3>
+                        
+                        <div style="text-align: center; margin-bottom: 24px;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🔄</div>
+                            <div style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">
+                                ${formatCrypto(fromAmount, 6)} ${fromCrypto}
+                            </div>
+                            <div style="font-size: 16px; color: var(--text-secondary); margin-bottom: 8px;">↓</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--success);">
+                                ${formatCrypto(toAmount, 8)} ${toCrypto}
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 16px; background: var(--bg-secondary); border-radius: 12px; margin-bottom: 24px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                                <span>Exchange Rate</span>
+                                <span style="font-weight: 600;">1 ${fromCrypto} = ${formatCrypto(APP.prices[fromCrypto] / APP.prices[toCrypto], 8)} ${toCrypto}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                                <span>Fee (0.5%)</span>
+                                <span style="font-weight: 600;">${formatCurrency(fee)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>You Receive</span>
+                                <span style="font-weight: 700; color: var(--success);">${formatCrypto(toAmount, 8)} ${toCrypto}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-secondary" style="flex: 1;" onclick="closeSwapModal()">Cancel</button>
+                            <button class="btn btn-primary" style="flex: 1;" onclick="confirmSwap(${fromAmount}, '${fromCrypto}', ${toAmount}, '${toCrypto}')">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function closeSwapModal() {
+            const modal = $('#swapModal');
+            modal.style.display = 'none';
+        }
+        
+        function confirmSwap(fromAmount, fromCrypto, toAmount, toCrypto) {
+            // Update balances
+            const users = getUsers();
+            const userIndex = users.findIndex(u => u.id === APP.currentUser.id);
+            users[userIndex].wallets[fromCrypto] -= fromAmount;
+            users[userIndex].wallets[toCrypto] += toAmount;
+            saveUsers(users);
+            APP.currentUser = users[userIndex];
+            // (Supabase mode) Do not persist currentUser to localStorage.
+            // Wallet/investment/role are always loaded from Supabase.
+            
+            // Add transaction
+            addTransaction({
+                type: 'swap',
+                fromCurrency: fromCrypto,
+                toCurrency: toCrypto,
+                fromAmount: fromAmount,
+                toAmount: toAmount
+            });
+            
+            closeSwapModal();
+            showToast(`Successfully swapped ${formatCrypto(fromAmount, 6)} ${fromCrypto} to ${formatCrypto(toAmount, 8)} ${toCrypto}!`, 'success');
+            
+            setTimeout(() => render(), 500);
+        }
+        
+        // Continue with more render functions...
+        window.openInvestModal = openInvestModal;
+        window.closeInvestModal = closeInvestModal;
+        window.calculateInvestmentReturn = calculateInvestmentReturn;
+        window.confirmInvestment = confirmInvestment;
+        window.calculateExchange = calculateExchange;
+        window.swapCurrencies = swapCurrencies;
+        window.openSwapConfirmModal = openSwapConfirmModal;
+        window.closeSwapModal = closeSwapModal;
+        window.confirmSwap = confirmSwap;
+        
+        // ==================== INITIALIZATION ====================
+        initStorage();
+        
+        // Handle initial route
+        window.addEventListener('hashchange', () => render());
+        window.addEventListener('load', () => render());
+
+        // When admin route is entered, load users from Supabase
+        window.addEventListener('hashchange', () => {
+            if (window.location.hash === '#/admin' && typeof adminEnsureUsersLoaded === 'function') {
+                adminEnsureUsersLoaded();
+            }
+        });
+        
+        // Make functions global
+        window.navigate = navigate;
+        window.logout = logout;
+        window.toggleSidebar = toggleSidebar;
+        window.toggleTheme = toggleTheme;
+        window.handleLogin = handleLogin;
+        window.handleRegister = handleRegister;
+        window.handleForgotPassword = handleForgotPassword;
+        window.checkPasswordStrength = checkPasswordStrength;
+        window.showToast = showToast;
+        
+        // Responsive sidebar
+        function checkWindowSize() {
+            const sidebar = $('#sidebar');
+            const mainContent = $('#mainContent');
+            const mobileLogo = $('#mobileLogo');
+            
+            if (window.innerWidth <= 768) {
+                sidebar?.classList.add('collapsed');
+                mainContent?.classList.add('expanded');
+                if (mobileLogo) mobileLogo.style.display = 'flex';
+            } else {
+                sidebar?.classList.remove('collapsed');
+                sidebar?.classList.remove('open');
+                mainContent?.classList.remove('expanded');
+                if (mobileLogo) mobileLogo.style.display = 'none';
+            }
+        }
+        
+        window.addEventListener('resize', checkWindowSize);
+        checkWindowSize();
+    </script>
+</body>
+</html>
