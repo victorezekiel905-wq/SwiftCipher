@@ -1346,7 +1346,9 @@ function getTransactions() {
 
                 // DB snapshots (for future writes)
                 _dbWallet: w,
-                _dbInvestment: inv
+                _dbInvestment: inv,
+                // Expose investment directly for growth engine compatibility
+                investment: inv
             };
         }
 
@@ -1395,6 +1397,8 @@ function getTransactions() {
 
             // Start the per-minute investment engine if applicable
             maybeStartInvestmentEngine();
+            // Also start the app-features.js growth engine if loaded
+            if (typeof window.maybeStartGrowthEngine === 'function') window.maybeStartGrowthEngine();
 
             navigate('#/dashboard');
             return true;
@@ -1433,7 +1437,7 @@ function getTransactions() {
                 role: 'user',
                 status: 'active',
                 wallet:     { balance: 0, pending: 0 },
-                investment: { amount: 0, profit: 0, completed: false, referredBy: referredBy }
+                investment: { amount: 0, profit: 0, status: 'inactive', completed: false, referredBy: referredBy }
             };
 
             const { error } = await window.sb.from('Users').insert(newRow);
@@ -1463,6 +1467,7 @@ function getTransactions() {
                 await refreshCurrentUserFromDb();
                 if (APP.currentUser) {
                     maybeStartInvestmentEngine();
+                    if (typeof window.maybeStartGrowthEngine === 'function') window.maybeStartGrowthEngine();
                 }
                 return !!APP.currentUser;
             } catch (e) {
