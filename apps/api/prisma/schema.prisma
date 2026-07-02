@@ -1,0 +1,739 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+}
+
+enum EnrollmentRole {
+  TEACHER
+  CO_TEACHER
+  STUDENT
+}
+
+enum LessonBlockType {
+  SLIDE
+  PDF
+  IMAGE
+  VIDEO
+  YOUTUBE
+  WHITEBOARD
+  POLL
+  QUIZ
+  DRAWING
+  WEBSITE_EMBED
+  CODE_EDITOR
+  SIMULATION
+  FILE_UPLOAD
+  AUDIO
+  TIMER
+  TEACHER_NOTES
+}
+
+enum SessionStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+}
+
+enum QuizQuestionType {
+  MCQ
+  TRUE_FALSE
+  FILL_BLANK
+  ESSAY
+  POLL
+  DRAG_DROP
+  MATCHING
+  ORDERING
+  IMAGE
+  HOTSPOT
+  AUDIO
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  GRADED
+}
+
+enum BehaviourPolarity {
+  POSITIVE
+  NEGATIVE
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  PUSH
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum LessonRevisionSource {
+  INITIAL
+  MANUAL_SAVE
+  AUTOSAVE
+  REORDER
+  TEMPLATE_PUBLICATION
+  TEMPLATE_INSTANTIATION
+  RESTORE
+}
+
+enum AssetStatus {
+  PENDING
+  READY
+  FAILED
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_ON_CUSTOMER
+  RESOLVED
+  CLOSED
+  ESCALATED
+}
+
+enum SupportTicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Tenant {
+  id               String           @id @default(cuid())
+  tenantId         String           @unique
+  name             String
+  slug             String           @unique
+  billingEmail     String
+  timezone         String           @default("UTC")
+  branding         Json?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  schools          School[]
+  users            User[]
+  classes          ClassRoom[]
+  lessons          Lesson[]
+  quizzes          Quiz[]
+  subscriptions    Subscription[]
+  featureFlags     FeatureFlag[]
+  auditLogs        AuditLog[]
+  usageSnapshots   UsageSnapshot[]
+  billingInvoices  BillingInvoice[]
+  supportTickets   SupportTicket[]
+}
+
+
+model User {
+  id               String           @id @default(cuid())
+  tenantId         String
+  email            String
+  passwordHash     String?
+  firstName        String
+  lastName         String
+  status           UserStatus       @default(ACTIVE)
+  mfaEnabled       Boolean          @default(false)
+  lastLoginAt      DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  tenant           Tenant           @relation(fields: [tenantId], references: [tenantId])
+  roles            UserRole[]
+  refreshTokens    RefreshToken[]
+  devices          Device[]
+  teacherProfile   TeacherProfile?
+  studentProfile   StudentProfile?
+  parentProfile    ParentProfile?
+  messages         Message[]
+  notifications    Notification[]
+  attendance       Attendance[]
+  auditLogs        AuditLog[]
+  lessonRevisions  LessonRevision[]
+  lessonEditorSessions LessonEditorSession[]
+  mediaAssets      MediaAsset[]
+  createdSupportTickets SupportTicket[] @relation("SupportTicketCreator")
+  assignedSupportTickets SupportTicket[] @relation("SupportTicketAssignee")
+  supportComments  SupportTicketComment[]
+
+  @@unique([tenantId, email])
+}
+
+model Role {
+  id               String           @id @default(cuid())
+  tenantId         String
+  name             String
+  slug             String
+  description      String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  permissions      RolePermission[]
+  users            UserRole[]
+
+  @@unique([tenantId, slug])
+}
+
+model Permission {
+  id               String           @id @default(cuid())
+  tenantId         String
+  code             String
+  description      String
+  createdAt        DateTime         @default(now())
+  roles            RolePermission[]
+
+  @@unique([tenantId, code])
+}
+
+model UserRole {
+  id               String           @id @default(cuid())
+  tenantId         String
+  userId           String
+  roleId           String
+  createdAt        DateTime         @default(now())
+  user             User             @relation(fields: [userId], references: [id])
+  role             Role             @relation(fields: [roleId], references: [id])
+
+  @@unique([tenantId, userId, roleId])
+}
+
+model RolePermission {
+  id               String           @id @default(cuid())
+  tenantId         String
+  roleId           String
+  permissionId     String
+  role             Role             @relation(fields: [roleId], references: [id])
+  permission       Permission       @relation(fields: [permissionId], references: [id])
+
+  @@unique([tenantId, roleId, permissionId])
+}
+
+model RefreshToken {
+  id               String           @id @default(cuid())
+  tenantId         String
+  userId           String
+  tokenHash        String
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime         @default(now())
+  user             User             @relation(fields: [userId], references: [id])
+}
+
+model Device {
+  id               String           @id @default(cuid())
+  tenantId         String
+  userId           String
+  label            String
+  ipAddress        String?
+  userAgent        String?
+  lastSeenAt       DateTime?
+  createdAt        DateTime         @default(now())
+  user             User             @relation(fields: [userId], references: [id])
+}
+
+model School {
+  id               String           @id @default(cuid())
+  tenantId         String
+  name             String
+  code             String
+  address          Json?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  tenant           Tenant           @relation(fields: [tenantId], references: [tenantId])
+  classes          ClassRoom[]
+
+  @@unique([tenantId, code])
+}
+
+model TeacherProfile {
+  id               String           @id @default(cuid())
+  tenantId         String
+  userId           String           @unique
+  employeeNumber   String
+  departmentId     String?
+  user             User             @relation(fields: [userId], references: [id])
+}
+
+model StudentProfile {
+  id               String           @id @default(cuid())
+  tenantId         String
+  userId           String           @unique
+  studentNumber    String
+  house            String?
+  user             User             @relation(fields: [userId], references: [id])
+}
+
+model ParentProfile {
+  id               String           @id @default(cuid())
+  tenantId         String
+  userId           String           @unique
+  relationship     String
+  user             User             @relation(fields: [userId], references: [id])
+}
+
+model ParentStudent {
+  id               String           @id @default(cuid())
+  tenantId         String
+  parentId         String
+  studentId        String
+}
+
+model Department {
+  id               String           @id @default(cuid())
+  tenantId         String
+  name             String
+  createdAt        DateTime         @default(now())
+}
+
+model Subject {
+  id               String           @id @default(cuid())
+  tenantId         String
+  name             String
+  code             String
+  createdAt        DateTime         @default(now())
+
+  @@unique([tenantId, code])
+}
+
+model AcademicSession {
+  id               String           @id @default(cuid())
+  tenantId         String
+  name             String
+  startsAt         DateTime
+  endsAt           DateTime
+  isActive         Boolean          @default(false)
+}
+
+model ClassRoom {
+  id               String           @id @default(cuid())
+  tenantId         String
+  schoolId         String
+  subjectId        String?
+  name             String
+  code             String
+  gradeLevel       String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  tenant           Tenant           @relation(fields: [tenantId], references: [tenantId])
+  school           School           @relation(fields: [schoolId], references: [id])
+  enrollments      ClassEnrollment[]
+  lessons          Lesson[]
+  quizzes          Quiz[]
+
+  @@unique([tenantId, code])
+}
+
+model ClassEnrollment {
+  id               String           @id @default(cuid())
+  tenantId         String
+  classRoomId      String
+  userId           String
+  role             EnrollmentRole
+  createdAt        DateTime         @default(now())
+  classRoom        ClassRoom        @relation(fields: [classRoomId], references: [id])
+
+  @@unique([tenantId, classRoomId, userId, role])
+}
+
+model Lesson {
+  id               String           @id @default(cuid())
+  tenantId         String
+  classRoomId      String
+  title            String
+  description      String?
+  version          Int              @default(1)
+  isTemplate       Boolean          @default(false)
+  createdById      String
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  tenant           Tenant           @relation(fields: [tenantId], references: [tenantId])
+  classRoom        ClassRoom        @relation(fields: [classRoomId], references: [id])
+  blocks           LessonBlock[]
+  sessions         LiveSession[]
+  revisions        LessonRevision[]
+  editorSessions   LessonEditorSession[]
+  assets           MediaAsset[]
+}
+
+model LessonBlock {
+  id               String           @id @default(cuid())
+  tenantId         String
+  lessonId         String
+  type             LessonBlockType
+  title            String
+  position         Int
+  content          Json
+  lesson           Lesson           @relation(fields: [lessonId], references: [id])
+
+  @@unique([tenantId, lessonId, position])
+}
+
+model LiveSession {
+  id               String           @id @default(cuid())
+  tenantId         String
+  lessonId         String
+  code             String
+  status           SessionStatus    @default(SCHEDULED)
+  startedAt        DateTime?
+  endedAt          DateTime?
+  metrics          Json?
+  lesson           Lesson           @relation(fields: [lessonId], references: [id])
+
+  @@unique([tenantId, code])
+}
+
+model Quiz {
+  id               String           @id @default(cuid())
+  tenantId         String
+  classRoomId      String
+  title            String
+  settings         Json
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  tenant           Tenant           @relation(fields: [tenantId], references: [tenantId])
+  classRoom        ClassRoom        @relation(fields: [classRoomId], references: [id])
+  questions        Question[]
+  attempts         QuizAttempt[]
+}
+
+model Question {
+  id               String           @id @default(cuid())
+  tenantId         String
+  quizId           String
+  type             QuizQuestionType
+  prompt           String
+  payload          Json
+  points           Int              @default(1)
+  position         Int
+  quiz             Quiz             @relation(fields: [quizId], references: [id])
+
+  @@unique([tenantId, quizId, position])
+}
+
+model QuizAttempt {
+  id               String           @id @default(cuid())
+  tenantId         String
+  quizId           String
+  studentId        String
+  status           AttemptStatus    @default(IN_PROGRESS)
+  score            Float?
+  answers          Json?
+  submittedAt      DateTime?
+  quiz             Quiz             @relation(fields: [quizId], references: [id])
+
+  @@unique([tenantId, quizId, studentId])
+}
+
+model BehaviourEvent {
+  id               String           @id @default(cuid())
+  tenantId         String
+  studentId        String
+  teacherId        String
+  category         String
+  points           Int
+  polarity         BehaviourPolarity
+  note             String?
+  createdAt        DateTime         @default(now())
+}
+
+model Reward {
+  id               String           @id @default(cuid())
+  tenantId         String
+  name             String
+  pointsCost       Int
+  inventory        Int?
+  createdAt        DateTime         @default(now())
+}
+
+model Achievement {
+  id               String           @id @default(cuid())
+  tenantId         String
+  name             String
+  criteria         Json
+  createdAt        DateTime         @default(now())
+}
+
+model Badge {
+  id               String           @id @default(cuid())
+  tenantId         String
+  name             String
+  iconUrl          String?
+  createdAt        DateTime         @default(now())
+}
+
+model Announcement {
+  id               String           @id @default(cuid())
+  tenantId         String
+  title            String
+  body             String
+  audience         Json
+  createdById      String
+  createdAt        DateTime         @default(now())
+}
+
+model MessageThread {
+  id               String           @id @default(cuid())
+  tenantId         String
+  subject          String?
+  createdAt        DateTime         @default(now())
+  participants     MessageParticipant[]
+  messages         Message[]
+}
+
+model MessageParticipant {
+  id               String           @id @default(cuid())
+  tenantId         String
+  threadId         String
+  userId           String
+  thread           MessageThread    @relation(fields: [threadId], references: [id])
+
+  @@unique([tenantId, threadId, userId])
+}
+
+model Message {
+  id               String           @id @default(cuid())
+  tenantId         String
+  threadId         String
+  senderId         String
+  body             String
+  attachments      Json?
+  createdAt        DateTime         @default(now())
+  thread           MessageThread    @relation(fields: [threadId], references: [id])
+  sender           User             @relation(fields: [senderId], references: [id])
+}
+
+model Story {
+  id               String           @id @default(cuid())
+  tenantId         String
+  title            String
+  media            Json
+  visibility       Json
+  createdById      String
+  createdAt        DateTime         @default(now())
+}
+
+model Notification {
+  id               String           @id @default(cuid())
+  tenantId         String
+  userId           String
+  title            String
+  body             String
+  channel          NotificationChannel
+  isRead           Boolean          @default(false)
+  createdAt        DateTime         @default(now())
+  user             User             @relation(fields: [userId], references: [id])
+}
+
+model Attendance {
+  id               String           @id @default(cuid())
+  tenantId         String
+  userId           String
+  classRoomId      String
+  recordedAt       DateTime         @default(now())
+  status           String
+  note             String?
+  user             User             @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id               String           @id @default(cuid())
+  tenantId         String
+  type             String
+  payload          Json
+  createdAt        DateTime         @default(now())
+}
+
+model Subscription {
+  id               String              @id @default(cuid())
+  tenantId         String
+  provider         String
+  externalId       String
+  plan             String
+  status           SubscriptionStatus
+  seats            Int
+  renewalAt        DateTime
+  createdAt        DateTime            @default(now())
+  tenant           Tenant              @relation(fields: [tenantId], references: [tenantId])
+  invoices         BillingInvoice[]
+
+  @@unique([tenantId, externalId])
+}
+
+model UsageSnapshot {
+  id               String           @id @default(cuid())
+  tenantId         String
+  periodStart      DateTime
+  periodEnd        DateTime
+  activeUsers      Int
+  classesCount     Int
+  lessonsCount     Int
+  liveSessionsCount Int
+  quizAttemptsCount Int
+  reportsGenerated Int
+  storageGb        Float
+  payload          Json
+  createdAt        DateTime         @default(now())
+  tenant           Tenant           @relation(fields: [tenantId], references: [tenantId])
+
+  @@index([tenantId, periodStart, periodEnd])
+}
+
+model BillingInvoice {
+  id               String           @id @default(cuid())
+  tenantId         String
+  subscriptionId   String
+  invoiceNumber    String
+  currency         String           @default("USD")
+  subtotalCents    Int
+  taxCents         Int              @default(0)
+  totalCents       Int
+  status           String           @default("draft")
+  periodStart      DateTime
+  periodEnd        DateTime
+  lineItems        Json
+  metadata         Json?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  tenant           Tenant           @relation(fields: [tenantId], references: [tenantId])
+  subscription     Subscription     @relation(fields: [subscriptionId], references: [id])
+
+  @@unique([tenantId, invoiceNumber])
+  @@index([tenantId, subscriptionId, createdAt])
+}
+
+model SupportTicket {
+  id               String               @id @default(cuid())
+  tenantId         String
+  title            String
+  description      String
+  status           SupportTicketStatus  @default(OPEN)
+  priority         SupportTicketPriority @default(MEDIUM)
+  category         String
+  createdById      String
+  assignedToId     String?
+  relatedEntityType String?
+  relatedEntityId  String?
+  dueAt            DateTime?
+  firstResponseAt  DateTime?
+  resolvedAt       DateTime?
+  metadata         Json?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  tenant           Tenant               @relation(fields: [tenantId], references: [tenantId])
+  createdBy        User                 @relation("SupportTicketCreator", fields: [createdById], references: [id])
+  assignedTo       User?                @relation("SupportTicketAssignee", fields: [assignedToId], references: [id])
+  comments         SupportTicketComment[]
+
+  @@index([tenantId, status, priority, createdAt])
+}
+
+model SupportTicketComment {
+  id               String           @id @default(cuid())
+  tenantId         String
+  ticketId         String
+  authorId         String
+  body             String
+  isInternal       Boolean          @default(false)
+  createdAt        DateTime         @default(now())
+  ticket           SupportTicket    @relation(fields: [ticketId], references: [id])
+  author           User             @relation(fields: [authorId], references: [id])
+
+  @@index([tenantId, ticketId, createdAt])
+}
+
+model AuditLog {
+  id               String           @id @default(cuid())
+  tenantId         String
+  actorId          String?
+  action           String
+  entityType       String
+  entityId         String
+  metadata         Json?
+  createdAt        DateTime         @default(now())
+  tenant           Tenant           @relation(fields: [tenantId], references: [tenantId])
+  actor            User?            @relation(fields: [actorId], references: [id])
+}
+
+model FeatureFlag {
+  id               String           @id @default(cuid())
+  tenantId         String
+  key              String
+  description      String?
+  enabled          Boolean          @default(false)
+  payload          Json?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  tenant           Tenant           @relation(fields: [tenantId], references: [tenantId])
+
+  @@unique([tenantId, key])
+}
+
+model LessonRevision {
+  id               String               @id @default(cuid())
+  tenantId         String
+  lessonId         String
+  createdById      String?
+  version          Int
+  source           LessonRevisionSource
+  title            String
+  description      String?
+  snapshot         Json
+  summary          String?
+  createdAt        DateTime             @default(now())
+  lesson           Lesson               @relation(fields: [lessonId], references: [id])
+  createdBy        User?                @relation(fields: [createdById], references: [id])
+
+  @@index([tenantId, lessonId, createdAt])
+}
+
+model LessonEditorSession {
+  id               String           @id @default(cuid())
+  tenantId         String
+  lessonId         String
+  userId           String
+  sessionKey       String
+  status           String           @default("ACTIVE")
+  deviceLabel      String?
+  userAgent        String?
+  lastHeartbeatAt  DateTime         @default(now())
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  lesson           Lesson           @relation(fields: [lessonId], references: [id])
+  user             User             @relation(fields: [userId], references: [id])
+
+  @@unique([tenantId, lessonId, sessionKey])
+  @@index([tenantId, lessonId, lastHeartbeatAt])
+}
+
+model MediaAsset {
+  id               String           @id @default(cuid())
+  tenantId         String
+  ownerId          String
+  lessonId         String?
+  displayName      String
+  fileName         String
+  objectKey        String           @unique
+  mimeType         String
+  sizeBytes        Int
+  status           AssetStatus      @default(PENDING)
+  checksum         String?
+  bucket           String
+  metadata         Json?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  lesson           Lesson?          @relation(fields: [lessonId], references: [id])
+  owner            User             @relation(fields: [ownerId], references: [id])
+
+  @@index([tenantId, lessonId, createdAt])
+}

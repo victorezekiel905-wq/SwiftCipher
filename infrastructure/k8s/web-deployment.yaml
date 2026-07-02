@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: classesphere-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: classesphere-web
+  template:
+    metadata:
+      labels:
+        app: classesphere-web
+    spec:
+      containers:
+        - name: web
+          image: classesphere/web:latest
+          ports:
+            - containerPort: 3000
